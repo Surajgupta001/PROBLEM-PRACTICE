@@ -35,6 +35,10 @@ Explanation: You need to reduce multiple spaces between two words to a single sp
 using namespace std;
 
 string reverseWord(string str){
+    // Remove leading and trailing spaces
+    while (!str.empty() && str[0] == ' ') str.erase(0, 1);
+    while (!str.empty() && str[str.length() - 1] == ' ') str.erase(str.length() - 1, 1);
+
     string word = ""; // store each word
     string reversed = ""; // store the final reversed string
     for(int i= str.length()-1;i>=0;i--){
