@@ -41,6 +41,24 @@ string addBinary(string str1, string str2){
     }
     return ans;
 }
+/*
+======== Optimised Code ===========
+string addBinary(string a, string b) {
+        int i = a.size() - 1;
+        int j = b.size() - 1;
+        int carry = 0;
+        string ans = "";
+
+        while (i >= 0 || j >= 0 || carry != 0) {
+            int x = (i >= 0 && a[i--] == '1') ? 1 : 0;
+            int y = (j >= 0 && b[j--] == '1') ? 1 : 0;
+            int sum = x + y + carry;
+            ans = (sum % 2 == 1) ? "1" + ans : "0" + ans;
+            carry = sum / 2;
+        }
+        return ans;
+    }
+*/ 
 int main(){
 
     string str1;
