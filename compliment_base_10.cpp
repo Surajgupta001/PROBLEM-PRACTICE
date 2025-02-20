@@ -25,3 +25,37 @@ Input: n = 10
 Output: 5
 Explanation: 10 is "1010" in binary, with complement "0101" in binary, which is 5 in base-10.
 */
+
+#include <iostream>
+using namespace std;
+
+int bitwiseComplement(int n){
+    /*
+    * Time : O(log n)
+    * Space : O(1)
+    */ 
+    if(n == 0) return 1;
+    int mask = 0;
+    int temp = n;
+
+    // Calculate the number of bits in n
+    while(temp > 0){
+        mask = (mask << 1) | 1;
+        // temp >>= 1; way to writing 
+        temp = temp >> 1;
+    }
+
+    // Flip all the bits in n
+    return n ^ mask;
+}
+
+int main(){
+    
+    int n;
+    cout<<"Enter a number: ";
+    cin>>n;
+    
+    cout<<"The complement of "<<n<<" is "<<bitwiseComplement(n)<<endl;
+    
+    return 0;
+}
