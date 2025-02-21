@@ -35,20 +35,39 @@ Explanation: All elements of the array are distinct, so we can keep all of them 
 #include <algorithm>
 using namespace std;
 
-vector<vector<int>> findMatrix(vector<int>& v) {
+// vector<vector<int>> findMatrix(vector<int>& v) {
+//     vector<vector<int>> ans;
+//     for (int num : v) {
+//         bool added = false;
+//         // Try to add the number to an existing row
+//         for (auto& row : ans) {
+//             if (find(row.begin(), row.end(), num) == row.end()) {
+//                 row.push_back(num);
+//                 added = true;
+//                 break;
+//             }
+//         }
+//         // If the number couldn't be added to any existing row, create a new row
+//         if (!added) ans.push_back({num});
+//     }
+//     return ans;
+// }
+
+vector<vector<int>> findMatrix(vector<int>& v){
     vector<vector<int>> ans;
-    for (int num : v) {
+    for(auto num : v){
         bool added = false;
-        // Try to add the number to an existing row
-        for (auto& row : ans) {
-            if (find(row.begin(), row.end(), num) == row.end()) {
+        for(auto &row : ans){
+            set<int> rowSet(row.begin(), row.end());
+            if(rowSet.find(num) == rowSet.end()){
                 row.push_back(num);
                 added = true;
                 break;
             }
         }
-        // If the number couldn't be added to any existing row, create a new row
-        if (!added) ans.push_back({num});
+        if(not added){
+            ans.push_back({num});
+        }
     }
     return ans;
 }
