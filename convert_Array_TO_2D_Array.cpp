@@ -1,5 +1,5 @@
 /*
-Convert an Array Into a 2D Array With Conditions - [Leetcode - 2160(Medium)]
+Convert an Array Into a 2D Array With Conditions - [Leetcode - 2610(Medium)]
 ================================================================================
 You are given an integer array nums. You need to create a 2D array from nums satisfying the following conditions:
 
