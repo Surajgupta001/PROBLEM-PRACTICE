@@ -1,23 +1,47 @@
 /*
-ADDING ONE TO NUMBER REPRESENTED AS ARRAY OF DIGITS(LEETCODE)
+Plus One - [Leetcode - 66(Easy)]
++=====================================+
+You are given a large integer represented as an integer array digits, where each digits[i] is the ith digit of the integer. The digits are ordered from most significant to least significant in left-to-right order. The large integer does not contain any leading 0's.
 
-Given a non-negative number represented as an array of digits, add 1 to the number ( increment the number represented by the digits ). The digits are stored such that the most significant digit is the first element of the array.
+Increment the large integer by one and return the resulting array of digits.
 
-Examples-1: 
 
-Input 1: [1, 2, 4]
-Output : [1, 2, 5]
+Example 1:
 
-Example-2:
+Input: digits = [1,2,3]
+Output: [1,2,4]
+Explanation: The array represents the integer 123.
+Incrementing by one gives 123 + 1 = 124.
+Thus, the result should be [1,2,4].
 
-Input 2: [9, 9, 9]
-Output : [1, 0, 0, 0]
+Example 2:
+
+Input: digits = [4,3,2,1]
+Output: [4,3,2,2]
+Explanation: The array represents the integer 4321.
+Incrementing by one gives 4321 + 1 = 4322.
+Thus, the result should be [4,3,2,2].
+
+Example 3:
+
+Input: digits = [9]
+Output: [1,0]
+Explanation: The array represents the integer 9.
+Incrementing by one gives 9 + 1 = 10.
+Thus, the result should be [1,0].
+ 
+
+Constraints:
+
+1 <= digits.length <= 100
+0 <= digits[i] <= 9
+digits does not contain any leading 0's.
 */
 #include <iostream>
-#include <vector>is
+#include <vector>
 using namespace std;
 
-vector<int> digitarrayPlusOne(vector<int>&digits){
+vector<int> digitarrayPlusOne(vector<int>& digits){
     
     int carry = 1;
 
@@ -32,6 +56,7 @@ vector<int> digitarrayPlusOne(vector<int>&digits){
     return digits;
 
 }
+
 int main(){
 
     int n;
