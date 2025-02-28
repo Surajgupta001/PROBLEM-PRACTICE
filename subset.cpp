@@ -23,6 +23,30 @@ All the numbers of nums are unique.
 #include <vector>
 using namespace std;
 
+vector<vector<int>> ans; // global
+
+void helper(vector<int>&v, int start, vector<int>curr){
+    ans.push_back(curr); // add the current subset to the answer list 
+    for(int i = start; i < v.size(); i++){
+        curr.push_back(v[i]); // add the current element to the current subset
+        helper(v, i + 1, curr); // recursively call the helper function with the updated
+        curr.pop_back(); // backtrack by removing the last element from the current subset
+    }
+}
+
 vector<vector<int>> subsets(vector<int>& v){
-          
+    ans.clear(); // clear the answer list before calling the helper function
+    helper(v, 0, {}); // call the helper function with the initial subset as an
+    return ans;
+}
+
+int main(){
+    vector<int> v = {1, 2, 3};
+    vector<vector<int>> result = subsets(v);
+    for(int i = 0; i < result.size(); i++){
+        for(int j = 0; j < result[i].size(); j++){
+            cout << result[i][j] << " ";
+        }
+    }
+    return 0;
 }
