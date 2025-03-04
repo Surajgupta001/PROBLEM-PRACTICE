@@ -34,3 +34,58 @@ Constraints:
 -106 <= nums[i] <= 106
 pivot equals to an element of nums.
 */ 
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+vector<int> partitionArraow(vector<int>& nums, int pivot){
+    
+    // Create three vector to store element less than, equal to, and greater than the pivot
+    vector<int> lessThanPivot;
+    vector<int> equalToPivot;
+    vector<int> greaterThanPivot;
+    
+    // Traverse the array and store the elements in the respective vectors
+    for(int i = 0; i < nums.size(); i++){
+        if(nums[i] < pivot){
+            lessThanPivot.push_back(nums[i]);
+        }
+        else if(nums[i] > pivot){
+            greaterThanPivot.push_back(nums[i]);
+        }
+        else{
+            equalToPivot.push_back(nums[i]);
+        }
+    }
+    
+    // Concatenate the three vectors to get the final result
+    vector<int> ans;
+    ans.insert(ans.end(), lessThanPivot.begin(), lessThanPivot.end());
+    ans.insert(ans.end(), equalToPivot.begin(), equalToPivot.end());
+    ans.insert(ans.end(), greaterThanPivot.begin(), greaterThanPivot.end());
+    
+    return ans;
+}
+
+int main(){
+
+    int n;
+    cout<<"Enter the size of vector: ";
+    cin>>n;
+
+    vector<int> v(n);
+    cout<<"Enter the elements of vector: ";
+    for(int i=0; i<v.size(); i++) cin>>v[i];
+
+    int pivot;
+    cout<<"Enter the pivot element: ";
+    cin>>pivot;
+    
+    vector<int>ans;
+    ans = partitionArraow(v, pivot);
+    cout<<"The final array is: ";
+    for(int i = 0; i < ans.size(); i++) cout<<ans[i]<<" ";
+    
+    return 0;
+}
