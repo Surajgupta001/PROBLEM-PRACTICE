@@ -28,3 +28,27 @@ Constraints:
 1 <= n <= 107
 */ 
 
+#include <iostream>
+#include <cmath>
+using namespace std;
+
+bool checkPowersOfThree(int n){
+    while(n > 0){
+        // i.e if remainder is 0 & 1 -> true.
+        // if remainder is 2 -> return false.
+        if(n % 3 == 2) return false;
+        n /= 3;
+    }
+    return true;
+}
+
+int main(){
+    
+    int n;
+    cout<<"Enter a number: ";
+    cin>>n;
+    
+    cout<<boolalpha<<checkPowersOfThree(n);
+    
+    return 0;
+}
