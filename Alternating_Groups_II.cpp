@@ -54,17 +54,19 @@ using namespace std;
 int numberOfAlternatingGroups(vector<int>& colors, int k) {
     int n = colors.size();
     
-    int window = n + k - 1;
-    
     int ans = 0;
-    int alt = 1;
-    int prev = colors[0];
+    int isAlterations = 1; // Initialize isAlterations to 1, assuming the first tile is part of an alternating group
 
-    for (int i = 1; i < window; i++) {
+    // Iterate over the vector and the additional k-1 tiles
+    for (int i = 1; i < n + k - 1; i++) {
+        // Calculate the index of the current tile in the vector
         int j = i % n;
-        alt = (prev == colors[j]) ? 1 : alt + 1;
-        ans += (alt >= k);
-        prev = colors[j];
+        
+        // Check if the current tile is part of an alternating group
+        isAlterations = (colors[(i-1) % n] == colors[j]) ? 1 : isAlterations + 1;
+        
+        // If the alternating group size is greater than or equal to k, increment the answer
+        ans += (isAlterations >= k);
     }
     return ans;
 }
