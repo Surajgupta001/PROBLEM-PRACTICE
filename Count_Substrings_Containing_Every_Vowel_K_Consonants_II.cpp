@@ -49,6 +49,7 @@ word consists only of lowercase English letters.
 
 
 #include <iostream>
+#include <string>
 #include <unordered_set>
 #include <unordered_map>
 using namespace std;
