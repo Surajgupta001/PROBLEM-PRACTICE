@@ -56,25 +56,65 @@ queries[i].length == 3
 */
 
 #include <iostream>
+#include <algorithm>
 #include <vector>
+#include <iterator>
 using namespace std;
 
-int minZeroArray(vector<int> &nums, vector<vector<int>> &queries){
-    vector<int> line(nums.size() + 1);
-    int decrement = 0;
-    int k = 0;
-    for (int i = 0; i < nums.size(); ++i){
-        while (decrement + line[i] < nums[i]){
-            if (k == queries.size()) return -1;
-            const int l = queries[k][0];
-            const int r = queries[k][1];
-            const int val = queries[k][2];
-            ++k;
-            if (r < i) continue;
-            line[max(l, i)] += val;
-            line[r + 1] -= val;
+bool checkWithDifferenceArrayTeq(vector<int> &nums, vector<vector<int>> &queries, int k){
+    int n = nums.size();
+    vector<int> diff(n, 0);
+
+    // Apply the first k queries
+    for (int i = 0; i <= k; i++){
+        int left = queries[i][0];
+        int right = queries[i][1];
+        int value = queries[i][2];
+
+        diff[left] += value;
+        if (right + 1 < n){
+            diff[right + 1] -= value;
         }
-        decrement += line[i];
+    }
+    // Calculate the prefix sum of the difference array
+    int prefixSum = 0;
+    for (int i = 0; i < n; i++){
+        prefixSum += diff[i];
+        diff[i] = prefixSum;
+
+        // Check if the array becomes zero
+        if (nums[i] - diff[i] > 0){
+            return false;
+        }
+    }
+    return true;
+}
+
+int minZeroArray(vector<int> &nums, vector<vector<int>> &queries){
+    int n = nums.size();
+    int Q = queries.size();
+
+    auto lambda = [](int x){
+        return x == 0;
+    };
+
+    if (all_of(begin(nums), end(nums), lambda)){
+        return 0; // no query required because all are already zero
+    }
+
+    int low = 0;
+    int high = Q - 1;
+    int k = -1;
+    while (low <= high){
+        int mid = low + (high - low) / 2;
+
+        if (checkWithDifferenceArrayTeq(nums, queries, mid) == true){
+            k = mid + 1; // possible answer
+            high = mid - 1;
+        }
+        else{
+            low = mid + 1;
+        }
     }
     return k;
 }
@@ -82,5 +122,7 @@ int minZeroArray(vector<int> &nums, vector<vector<int>> &queries){
 int main(){
     vector<int> nums = {2, 0, 2};
     vector<vector<int>> queries = {{0, 2, 1}, {0, 2, 1}, {1, 1, 3}};
-    cout << minZeroArray(nums, queries) << endl;
+    int result = minZeroArray(nums, queries);
+    cout << result << endl;
+    return 0;
 }
