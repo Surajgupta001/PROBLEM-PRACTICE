@@ -31,47 +31,70 @@ Constraints:
 #include <vector>
 using namespace std;
 
-// Check if it's possible to allocate candies so that each child gets 'x' candies
-bool canAllocateCandies(vector<int> &candies, long long k, int x){ // x -> nummber Of Candies
-    // Initialize the total number of children that can be served
-    long long total = 0; // maximum Number OfChildren
-
-    for (int i = 0; i < candies.size(); i++){
-        total += candies[i] / x; // Add the number of children this pile can serve
+/*
+=========== Brute Force ==================
+int maxCandies(vector<int>& candies, int k){
+    int n = candies.size();
+    int maxCandies = 0;
+    int total = 0;
+    for(int i = 0; i < n; i++){
+        total += candies[i];
+        maxCandies = max(maxCandies, candies[i]);
     }
-    return total >= k;
+    if(total < k) return 0;
+
+    // Brute force try maxC till 1 
+    for(int c = maxCandies; c >= 1; c--){
+        long long count = 0;
+        for(int i = 0; i < n; i++){
+            count += candies[i] / c; // How many children can get c candies from this pile
+        }
+        if(count >= k) return c;
+    }
+    return 0;
+}
+*/ 
+
+// ========= Optimised/Improved code
+bool canDistribute(vector<int>& candies, int mid, long long k){
+    int n = candies.size();
+    for(int i=0; i<n; i++){
+        k -= candies[i]/mid;
+        if(k <= 0){ // all children got mid candies
+            return true; // Early return
+        }
+    }
+    return k <= 0; // all children get the mid candies
 }
 
-// Find the maximum number of candies each child can get
-int maximumCandies(vector<int> &candies, long long k){
-    // Find the maximum number of candies in any pile
-    int max = 0; // maximum Candies In Pile
-    for (int i = 0; i < candies.size(); i++){
-        max = std::max(max, candies[i]);
+// Binary Search
+int maxCandies(vector<int>& candies, int k){
+    int n = candies.size();
+    int maxCandies = 0;
+    long long total = 0;
+    int ans = 0;
+
+    for(int i=0; i<n; i++){
+        total += candies[i];
+        maxCandies = max(maxCandies, candies[i]);
     }
+    if(total < k) return 0;
 
-    // Set the initial search range for binary search
-    int low = 0;
-    int high = max;
+    int low = 1;
+    int high = maxCandies;
 
-    // Binary search to find the maximum number of candies each child can get
-    while (low < high){
-        // Calculate the middle value of the current range
-        int mid = (low + high + 1) / 2;
-
-        // Check if it's possible to allocate candies so that each child gets 'mid' candies
-        if (canAllocateCandies(candies, k, mid)){
-            // If possible, move to the upper half to search for a larger number
-            low = mid;
+    while(low <= high){ // Time : n*log(max c)
+        int mid = low + (high - low)/2;
+        if(canDistribute(candies, mid, k)){
+            ans = mid;
+            low = mid + 1;
         }
         else{
-            // Otherwise, move to the lower half
             high = mid - 1;
         }
     }
-    return low;
+    return ans;
 }
-
 
 int main(){
     int n, k;
@@ -80,5 +103,5 @@ int main(){
     for (int i = 0; i < n; i++){
         cin >> candies[i];
     }
-    cout << maximumCandies(candies, k) << endl;
+    cout << maxCandies(candies, k) << endl;
 }
