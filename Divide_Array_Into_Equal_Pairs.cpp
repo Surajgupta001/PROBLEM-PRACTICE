@@ -33,7 +33,9 @@ nums.length == 2 * n
 
 #include <iostream>
 #include <vector>
+#include <algorithm>
 #include <unordered_map>
+#include <unordered_set>
 using namespace std;
 
 /*
@@ -62,6 +64,19 @@ bool divideArray(vector<int>& nums){
 }
 */ 
 
+// Bit Manupulations
+bool divideArray(vector<int>& nums) {
+    int n = nums.size();
+    sort(nums.begin(), nums.end());
+    for (int i = 1; i < n; i+=2) {
+        if ((nums[i] ^ nums[i-1]) != 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
+// HashMap
 bool divideArray(vector<int>& nums){
     unordered_map<int, int> countMap;
     for (int num : nums){
@@ -73,6 +88,31 @@ bool divideArray(vector<int>& nums){
         }
     }
     return true;
+}
+
+// Vector
+bool divideArray(vector<int>& nums){
+    sort(nums.begin(), nums.end());
+    for(int i=1; i<nums.size(); i+=2){
+        if(nums[i] != nums[i-1]){
+            return false;
+        }
+    }
+    return true;
+}
+
+// HashSet
+bool divideArray(vector<int>& nums){
+    unordered_set<int> set;
+    for(auto &itr : nums){
+        if(set.count(itr)){
+            set.erase(itr);
+        }
+        else{
+            set.insert(itr);
+        }
+    }
+    return set.empty();
 }
 
 int main(){
