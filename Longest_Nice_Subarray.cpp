@@ -64,6 +64,30 @@ int longestNiceSubarray(vector<int>& nums) {
     return max_length;
 }
 
+/*
+int longestNiceSubarray(vector<int>& nums) {
+    
+    int n = nums.size();
+    
+    int i = 0;
+    int j = 0;
+    int max_length = 1;
+    int bitMask = 0;
+
+    while(j < n) {
+        while((bitMask & nums[j]) != 0) { //keep shrinking
+            bitMask = (bitMask ^ nums[i]);
+            i++;
+        }
+        max_length = max(max_length, j-i+1);
+        bitMask = (bitMask | nums[j]);
+        j++;
+    }
+    return max_length;
+
+}
+*/ 
+
 int main(){
     vector<int> nums = {1,3,8,48,10};
     cout << longestNiceSubarray(nums) << endl;
