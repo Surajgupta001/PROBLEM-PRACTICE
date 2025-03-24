@@ -33,7 +33,9 @@ int searchInsert(vector<int>& nums, int target){
         else if(nums[mid] > target) high = mid-1;
         else low = mid+1;
     }
-    return low;
+    // return low; -> this is also give a correct ans;
+    // Use lower_bound to find the index where the target value should be inserted
+    return lower_bound(nums.begin(), nums.end(), target) - nums.begin();
 }
 
 int main(){
