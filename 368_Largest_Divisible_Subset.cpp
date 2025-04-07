@@ -81,6 +81,49 @@ vector<int> largestDivisibleSubset(vector<int>& nums) {
     return result;
 }
 
+/*
+=============== Binary Search Approach ===============
+vector<int> largestDivisibleSubset(vector<int>& nums) {
+    if(nums.empty()) return {}; // Handle empty input
+    sort(nums.begin(), nums.end()); // Sort the input array
+
+    vector<int> dp(nums.size(), 1); // DP array to store the size of the largest divisible subset ending at each index
+    vector<int> prev(nums.size(), -1); // Array to store the previous index in the subset
+
+    int maxSize = 1, maxIndex = 0; // Variables to track the maximum size and index of the largest subset
+
+    for(int i=1; i<nums.size(); i++){
+        int j = binarySearch(nums, nums[i]); // Find the previous index using binary search
+        if(j != -1 && dp[i] < dp[j] + 1){
+            dp[i] = dp[j] + 1; // Update the size of the largest divisible subset
+            prev[i] = j; // Update the previous index
+        }
+        if(dp[i] > maxSize){
+            maxSize = dp[i]; // Update the maximum size
+            maxIndex = i; // Update the index of the largest subset
+        }
+    }
+    vector<int> result; // Vector to store the result
+    while(maxIndex != -1){
+        result.push_back(nums[maxIndex]); // Add the current element to the result
+        maxIndex = prev[maxIndex]; // Move to the previous index
+    }
+    reverse (result.begin(), result.end()); // Reverse the result to get the correct order
+    return result;
+}
+
+int binarySearch(vector<int>& nums, int target) {
+    int left = 0, right = nums.size() - 1;
+    while(left <= right){
+        int mid = left + (right - left) / 2;
+        if(nums[mid] % target == 0) return mid;
+        else if(nums[mid] < target) left = mid + 1;
+        else right = mid - 1;
+    }
+    return -1;
+}
+*/ 
+
 int main(){
         
     ios_base::sync_with_stdio(false);
