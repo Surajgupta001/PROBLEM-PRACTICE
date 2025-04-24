@@ -69,3 +69,13 @@ int numberOfArrays(vector<int>& differences, int lower, int upper) {
 
     return (upper - maxVal) - (lower - minVal) + 1;
 }
+
+int main() {
+    vector<int> differences = {1, -3, 4};
+    int lower = 1;
+    int upper = 6;
+
+    cout << numberOfArrays(differences, lower, upper) << endl; // Output: 2
+
+    return 0;
+}
