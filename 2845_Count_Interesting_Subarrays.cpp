@@ -49,3 +49,52 @@ Constraints:
 1 <= modulo <= 109
 0 <= k < modulo
 */ 
+
+#include <iostream>
+#include <vector>
+#include <unordered_map>
+#include <algorithm>
+using namespace std;
+
+// // Brute Force Approach
+// long long countInterestingSubarrays(vector<int>& nums, int modulo, int k) {
+//     int count = 0;
+//     for(int i=0; i< nums.size(); i++){
+//         int cnt = 0;
+//         for(int j=i; j<nums.size(); j++){
+//             if(nums[j] % modulo == k) cnt++;
+//             if(cnt % modulo == k) count++;
+//         }
+//     }
+//     return count;
+// }
+
+// Optimized Approach using Prefix Sum and Hash Map
+long long countInterestingSubarrays(vector<int>& nums, int modulo, int k){
+    int n = nums.size();
+    long long count = 0;
+    unordered_map<int, int> prefixCount;
+    prefixCount[0] = 1; // Initialize with the empty prefix sum
+
+    int currentCount = 0;
+
+    for (int i = 0; i < n; i++) {
+        if (nums[i] % modulo == k) {
+            currentCount++;
+        }
+
+        // Check if the current count modulo is present in the map
+        count += prefixCount[(currentCount - k + modulo) % modulo];
+        prefixCount[currentCount % modulo]++;
+    }
+
+    return count;
+}
+
+int main(){
+    vector<int> nums = {3,2,4};
+    int modulo = 2;
+    int k = 1;
+    cout << countInterestingSubarrays(nums, modulo, k) << endl; // Output: 3
+    return 0;
+}
