@@ -44,3 +44,13 @@ int numRabbits(vector<int>& answers) {
 
     return total;
 }
+
+int main() {
+    vector<int> answers = {1, 1, 2};
+    cout << numRabbits(answers) << endl; // Output: 5
+
+    answers = {10, 10, 10};
+    cout << numRabbits(answers) << endl; // Output: 11
+
+    return 0;
+}
