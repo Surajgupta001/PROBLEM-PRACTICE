@@ -50,45 +50,56 @@ Constraints:
 0 <= k < modulo
 */ 
 
+// ================== Firstly solve -> Leetcode - [974] ======== Then come this problem ===========
+
 #include <iostream>
 #include <vector>
 #include <unordered_map>
 #include <algorithm>
 using namespace std;
 
-// // Brute Force Approach
-// long long countInterestingSubarrays(vector<int>& nums, int modulo, int k) {
-//     int count = 0;
-//     for(int i=0; i< nums.size(); i++){
-//         int cnt = 0;
-//         for(int j=i; j<nums.size(); j++){
-//             if(nums[j] % modulo == k) cnt++;
-//             if(cnt % modulo == k) count++;
-//         }
-//     }
-//     return count;
-// }
+// Brute Force Approach
+long long countInterestingSubarrays(vector<int>& nums, int modulo, int k) {
+    int count = 0;
+    for(int i=0; i< nums.size(); i++){
+        int cnt = 0;
+        for(int j=i; j<nums.size(); j++){
+            if(nums[j] % modulo == k) cnt++;
+            if(cnt % modulo == k) count++;
+        }
+    }
+    return count;
+}
 
 // Optimized Approach using Prefix Sum and Hash Map
-long long countInterestingSubarrays(vector<int>& nums, int modulo, int k){
-    int n = nums.size();
-    long long count = 0;
-    unordered_map<int, int> prefixCount;
-    prefixCount[0] = 1; // Initialize with the empty prefix sum
-
-    int currentCount = 0;
-
-    for (int i = 0; i < n; i++) {
-        if (nums[i] % modulo == k) {
-            currentCount++;
+long long countInterestingSubarrays(vector<int>& nums, int modulo, int k) {
+    for(int i=0; i<nums.size(); i++){
+        if((nums[i] % modulo) == k){
+            nums[i] = 1;
         }
-
-        // Check if the current count modulo is present in the map
-        count += prefixCount[(currentCount - k + modulo) % modulo];
-        prefixCount[currentCount % modulo]++;
+        else{
+            nums[i] = 0;
+        }
     }
 
-    return count;
+    unordered_map<int, long long> map;// remainder(long long) -> count
+    long long prefixSum = 0; // Sum will be equal to count of those elements % modulo == k
+
+    long long result = 0;
+
+    map[0] = 1;
+
+    for(int i=0; i<nums.size(); i++){
+        prefixSum += nums[i];
+
+        int remainder_1 = prefixSum % modulo;
+
+        int remainder_2 = (remainder_1 - k + modulo) % modulo; // Important
+
+        result += map[remainder_2];
+        map[remainder_1]++;
+    }
+    return result;
 }
 
 int main(){
