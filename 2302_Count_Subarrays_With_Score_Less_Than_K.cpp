@@ -69,3 +69,12 @@ long long countSubarrays(vector<int>& nums, long long k) {
 
     return result;
 }
+
+int main(){
+    
+    vector<int> nums = {2, 1, 4, 3, 5};
+    long long k = 10;
+    cout << countSubarrays(nums, k) << endl; // Output: 6
+
+    return 0;
+}
