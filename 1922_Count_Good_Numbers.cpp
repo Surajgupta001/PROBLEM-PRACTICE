@@ -52,3 +52,12 @@ int findPower(long long a, long long b){
 int countGoodNumbers(long long n){
     return (long long)findPower(5, (n + 1) / 2) * findPower(4, n / 2) % M;
 }
+
+int main(){
+    
+    long long n;
+    cin >> n;
+    cout << countGoodNumbers(n) << endl;
+
+    return 0;
+}
