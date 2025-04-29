@@ -30,7 +30,9 @@ nums.length == n
 */ 
 
 
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
+#include <algorithm>
 using namespace std;
 
 long long countFairPairs(vector<int>& nums, int lower, int upper) {
@@ -40,17 +42,13 @@ long long countFairPairs(vector<int>& nums, int lower, int upper) {
 
     long long result = 0;
 
-    for (int i = 0; i < n; i++) { // O(n * logn)
-        // o(n)
-        int idx =
-            lower_bound(begin(nums) + i + 1, end(nums), lower - nums[i]) -
-            begin(nums); // Gives the firstc element NOT LESS than (lower -
-                         // nums[i]) //log(n)
+    for (int i = 0; i < n; i++) { // O(n * logn) o(n)
+        
+        int idx = lower_bound(begin(nums) + i + 1, end(nums), lower - nums[i]) - begin(nums); // Gives the firstc element NOT LESS than (lower - nums[i]) //log(n)
+        
         int x = idx - 1 - i;
-
-        idx = upper_bound(begin(nums) + i + 1, end(nums), upper - nums[i]) -
-              begin(nums); // Gives the firstc element GREATER than (upper -
-                           // nums[i]) //log(n)
+        
+        idx = upper_bound(begin(nums) + i + 1, end(nums), upper - nums[i]) - begin(nums); // Gives the firstc element GREATER than (upper - nums[i]) //log(n)
 
         int y = idx - 1 - i;
 
@@ -58,4 +56,13 @@ long long countFairPairs(vector<int>& nums, int lower, int upper) {
     }
 
     return result;
+}
+
+int main(){
+    vector<int> nums = {0,1,7,4,4,5};
+    int lower = 3;
+    int upper = 6;
+    cout << countFairPairs(nums, lower, upper) << endl; // Output: 6
+
+    return 0;
 }
