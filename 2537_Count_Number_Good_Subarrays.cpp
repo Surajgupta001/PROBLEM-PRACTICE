@@ -46,8 +46,7 @@ long long countGood(vector<int>& nums, int k) {
     long long pairs = 0;
 
     while (j < n) {
-        pairs +=
-            mp[nums[j]]; // isse pehle kitni baar nums[j] dekha hai humne
+        pairs += mp[nums[j]]; // isse pehle kitni baar nums[j] dekha hai humne
         mp[nums[j]]++;
 
         while (pairs >= k) {
@@ -61,4 +60,13 @@ long long countGood(vector<int>& nums, int k) {
     }
 
     return result;
+}
+
+int main(){
+    
+    vector<int> nums = {3,1,4,3,2,2,4};
+    int k = 2;
+    cout << countGood(nums, k) << endl; // Output: 4
+    
+    return 0;
 }
