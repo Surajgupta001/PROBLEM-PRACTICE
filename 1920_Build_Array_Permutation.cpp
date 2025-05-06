@@ -34,17 +34,17 @@ The elements in nums are distinct.
 #include <vector>
 using namespace std;
 
-vector<int> buildArray(vector<int>& nums){
-    /*
-    Time Complexity: O(n)
-    Space Complexity: O(n)
-    */ 
-    vector<int> ans(nums.size());
-    for(int i=0; i<nums.size(); i++){
-        ans[i] = nums[nums[i]];
-    }
-    return ans;
-}
+// vector<int> buildArray(vector<int>& nums){
+//     /*
+//     Time Complexity: O(n)
+//     Space Complexity: O(n)
+//     */ 
+//     vector<int> ans(nums.size());
+//     for(int i=0; i<nums.size(); i++){
+//         ans[i] = nums[nums[i]];
+//     }
+//     return ans;
+// }
 
 vector<int> buildArray(vector<int>& nums){
     /*
