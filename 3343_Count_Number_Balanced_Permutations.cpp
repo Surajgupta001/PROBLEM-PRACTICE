@@ -51,7 +51,6 @@ num consists of digits '0' to '9' only.
 #include <iostream>
 #include <vector>
 #include <string>
-#include <unordered_map>
 #include <unordered_set>
 #include <algorithm>
 using namespace std;
@@ -83,10 +82,10 @@ int countBalancedPermutations(string num){
     return count;
 }
 
-// Optimized Approach using Backtracking and Memoization
+// Optimized Approach using Memoization
 int n;
 int totalDigitSum;
-int M = 1e9 + 7;
+int mod = 1e9 + 7;
 long long totalPermPossible = 0;
 
 // Binary exponentian
@@ -96,15 +95,15 @@ int findPower(long long a, long long b){
     }
 
     long long half = findPower(a, b / 2);
-    long long result = (half * half) % M;
+    long long result = (half * half) % mod;
     if (b % 2 == 1){
-        result = (result * a) % M;
+        result = (result * a) % mod;
     }
 
     return result;
 }
 
-int solve(int digit, int evenIndexDigitsCount, int currSum, vector<int> &freq, vector<long long> &fermatFact, vector<vector<vector<int>>> &t){
+int solve(int digit, int evenIndexDigitsCount, int currSum, vector<int> &freq, vector<long long> &fermatFact, vector<vector<vector<int>>> &dp){
     if (digit == 10){
         if (currSum == totalDigitSum / 2 && evenIndexDigitsCount == (n + 1) / 2){
             return totalPermPossible;
@@ -112,8 +111,8 @@ int solve(int digit, int evenIndexDigitsCount, int currSum, vector<int> &freq, v
         return 0;
     }
 
-    if (t[digit][evenIndexDigitsCount][currSum] != -1){
-        return t[digit][evenIndexDigitsCount][currSum];
+    if (dp[digit][evenIndexDigitsCount][currSum] != -1){
+        return dp[digit][evenIndexDigitsCount][currSum];
     }
     long long ways = 0;
 
@@ -121,14 +120,14 @@ int solve(int digit, int evenIndexDigitsCount, int currSum, vector<int> &freq, v
         int evenPosCount = count;
         int oddPosCount = freq[digit] - count;
 
-        long long div = (fermatFact[evenPosCount] * fermatFact[oddPosCount]) % M;
+        long long div = (fermatFact[evenPosCount] * fermatFact[oddPosCount]) % mod;
 
-        long long val = solve(digit + 1, evenIndexDigitsCount + evenPosCount, currSum + digit * count, freq, fermatFact, t);
+        long long val = solve(digit + 1, evenIndexDigitsCount + evenPosCount, currSum + digit * count, freq, fermatFact, dp);
 
-        ways = (ways + (val * div) % M) % M;
+        ways = (ways + (val * div) % mod) % mod;
     }
 
-    return t[digit][evenIndexDigitsCount][currSum] = ways;
+    return dp[digit][evenIndexDigitsCount][currSum] = ways;
 }
 
 int countBalancedPermutations(string num){
@@ -150,21 +149,34 @@ int countBalancedPermutations(string num){
     fact[0] = 1;
     fact[1] = 1;
     for (int i = 2; i <= n; i++){
-        fact[i] = (fact[i - 1] * i) % M;
+        fact[i] = (fact[i - 1] * i) % mod;
     }
 
-    // Precomputing FermatFactorial (inverse factorial --- (1/x)%M)
+    // Precomputing FermatFactorial (inverse factorial --- (1/x)%mod)
     vector<long long> fermatFact(n + 1, 1);
     for (int i = 0; i <= n; i++){
-        fermatFact[i] = findPower(fact[i], M - 2) % M;
+        fermatFact[i] = findPower(fact[i], mod - 2) % mod;
     }
 
-    totalPermPossible = (1LL * fact[(n + 1) / 2] * fact[n / 2]) % M;
+    totalPermPossible = (1LL * fact[(n + 1) / 2] * fact[n / 2]) % mod;
 
     int digit = 0;
     int evenIndexDigitsCount = 0;
     int currSum = 0;
-    vector<vector<vector<int>>> t(10, vector<vector<int>>((n + 1) / 2 + 1, vector<int>(totalDigitSum + 1, -1)));
+    vector<vector<vector<int>>> dp(10, vector<vector<int>>((n + 1) / 2 + 1, vector<int>(totalDigitSum + 1, -1)));
     
-    return solve(digit, evenIndexDigitsCount, currSum, freq, fermatFact, t);
+    return solve(digit, evenIndexDigitsCount, currSum, freq, fermatFact, dp);
+}
+
+int main(){
+    string num = "12345";
+    cout << countBalancedPermutations(num) << endl; // Output: 0
+
+    num = "112";
+    cout << countBalancedPermutations(num) << endl; // Output: 1
+
+    num = "123";
+    cout << countBalancedPermutations(num) << endl; // Output: 2
+
+    return 0;
 }
