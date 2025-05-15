@@ -9,8 +9,6 @@ Return the length of the resulting string after exactly t transformations.
 
 Since the answer may be very large, return it modulo 109 + 7.
 
- 
-
 Example 1:
 
 Input: s = "abcyy", t = 2, nums = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2]
@@ -54,80 +52,91 @@ First Transformation (t = 1):
 String after the first transformation: "bcabcdlm"
 Final Length of the string: The string is "bcabcdlm", which has 8 characters.
 
- 
+
 
 Constraints:
 
 1 <= s.length <= 105
 s consists only of lowercase English letters.
-1 <= t <= 109
+1 <= t <= 10^9
 nums.length == 26
 1 <= nums[i] <= 25
-*/ 
+*/
 
 #include <iostream>
-#include <string>
 #include <vector>
 using namespace std;
 
 typedef vector<vector<int>> Matrix;
-    int MOD = 1e9 + 7;
+int MOD = 1e9 + 7;
 
-    Matrix matrixMultiplication(const Matrix& A, const Matrix& B) {
-        Matrix result(26, vector<int>(26, 0));
-        for (int i = 0; i < 26; ++i) {
-            for (int j = 0; j < 26; ++j) {
-                for (int k = 0; k < 26; ++k) {
-                    result[i][j] = (result[i][j] + (1LL * A[i][k] * B[k][j]) % MOD) % MOD;
-                }
+Matrix matrixMultiplication(const Matrix &A, const Matrix &B){
+    Matrix result(26, vector<int>(26, 0));
+    for (int i = 0; i < 26; ++i){
+        for (int j = 0; j < 26; ++j){
+            for (int k = 0; k < 26; ++k){
+                result[i][j] = (result[i][j] + (1LL * A[i][k] * B[k][j]) % MOD) % MOD;
             }
         }
-        return result;
+    }
+    return result;
+}
+
+Matrix matrixExponentiation(const Matrix &base, int exponent){
+
+    if (exponent == 0){
+        Matrix identity(26, vector<int>(26, 0));
+        for (int i = 0; i < 26; ++i){
+            identity[i][i] = 1;
+        }
+        return identity;
     }
 
-    Matrix matrixExponentiation(const Matrix& base, int exponent) {
+    Matrix half = matrixExponentiation(base, exponent / 2);
+    Matrix result = matrixMultiplication(half, half);
 
-        if (exponent == 0) {
-            Matrix identity(26, vector<int>(26, 0));
-            for (int i = 0; i < 26; ++i)
-                identity[i][i] = 1;
-            return identity;
-        }
-
-        Matrix half   = matrixExponentiation(base, exponent / 2);
-        Matrix result = matrixMultiplication(half, half);
-
-        if (exponent % 2 == 1)
-            result = matrixMultiplication(result, base);
-
-        return result;
+    if (exponent % 2 == 1){
+        result = matrixMultiplication(result, base);
     }
 
-public:
-    int lengthAfterTransformations(string s, int t, vector<int>& nums) {
-        vector<int> freq(26, 0);
-        for (char &ch : s) {
-            freq[ch - 'a']++;
-        }
+    return result;
+}
 
-        Matrix T(26, vector<int>(26, 0));
-        for (int i = 0; i < 26; ++i) {
-            for (int add = 1; add <= nums[i]; ++add)
-                T[(i + add) % 26][i]++;
-        }
-
-        Matrix result = matrixExponentiation(T, t);
-
-        vector<int> updated_freq(26, 0);
-        for (int i = 0; i < 26; ++i) {
-            for (int j = 0; j < 26; ++j)
-                updated_freq[i] = (updated_freq[i] + (1LL * result[i][j] * freq[j]) % MOD) % MOD;
-        }
-
-        int resultLength = 0;
-        for (int i = 0; i < 26; ++i)
-            resultLength = (resultLength + updated_freq[i]) % MOD;
-
-        return resultLength;
+int lengthAfterTransformations(string s, int t, vector<int> &nums){
+    vector<int> freq(26, 0);
+    for (char &ch : s){
+        freq[ch - 'a']++;
     }
 
+    Matrix T(26, vector<int>(26, 0));
+    for (int i = 0; i < 26; ++i){
+        for (int add = 1; add <= nums[i]; ++add){
+            T[(i + add) % 26][i]++;
+        }
+    }
+
+    Matrix result = matrixExponentiation(T, t);
+
+    vector<int> updated_freq(26, 0);
+    for (int i = 0; i < 26; ++i){
+        for (int j = 0; j < 26; ++j){
+            updated_freq[i] = (updated_freq[i] + (1LL * result[i][j] * freq[j]) % MOD) % MOD;
+        }
+    }
+
+    int resultLength = 0;
+    for (int i = 0; i < 26; ++i){
+        resultLength = (resultLength + updated_freq[i]) % MOD;
+    }
+
+    return resultLength;
+}
+
+int main () {
+    
+    string s = "abcyy";
+    int t = 2;
+    vector<int> nums = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2};
+    
+    cout << lengthAfterTransformations(s, t, nums) << endl; // Output: 7
+}
