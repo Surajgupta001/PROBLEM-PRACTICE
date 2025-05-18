@@ -28,135 +28,56 @@ Explanation: The two lists do not intersect, so return null.
 #include <iostream>
 using namespace std;
 
-class node{
-    public:
-    int value;
+// Define the node structure
+class node {
+public:
+    int data;
     node* next;
-
-    //constructor
-    node(int data){
-
-        value = data;
-        next = nullptr;
-    }
-};
-
-class LinkedList{
-    public:
-    node *head;
-
-    // constructor
-    LinkedList(){
-        head = nullptr;
-    }
-
-    // insertion
-    void insertAtTail(int data){
-        node *newNode = new node(data);
-        if(head == nullptr){
-            head = newNode;
-            return;
-        }
-        node *temp = head;
-        while(temp->next != nullptr){
-            temp = temp->next;
-        }
-        temp->next = newNode;
-    }
-
-    void display(){
-        node *temp = head;
-        while(temp != nullptr){
-            cout<<temp->value<<"->";
-            temp = temp->next;
-        }
-        cout<<"NULL"<<endl;
-    }
+    node(int val) : data(val), next(nullptr) {}
 };
 
 // Function to find the intersection of two linked list
 node *getIntersectionNode(node *headA, node *headB){
-    /*
-    * Time: O(n+m) - Length of two linked list
-    * Space: O(1) - No extra space is used
-    */ 
-    if(!headA || !headB) return nullptr;
-    node *ptr_1 = headA;
-    node *ptr_2 = headB;
-    // Move to the next node or to the head of the other list
-    while(ptr_1 != ptr_2){
-        /*
-        * condition ? expression1 : expression2;
+    if (!headA || !headB) return nullptr;
 
-        => if condition is true, expression1 is executed.
-        => if condition is false, expression2 is executed.
-        */ 
-        ptr_1 = ptr_1 ? ptr_1->next : headB;
-        ptr_2 = ptr_2 ? ptr_2->next : headA;
+    node* a = headA;
+    node* b = headB;
+
+    // Traverse both lists. When one pointer reaches the end, redirect it to the head of the other list.
+    // If the lists intersect, the pointers will meet at the intersection node after at most 2 passes.
+    while (a != b) {
+        a = a ? a->next : headB;
+        b = b ? b->next : headA;
     }
-    // will be null if there's no intersection
-    return ptr_1; 
+    return a; // Can be nullptr (no intersection) or the intersection node
 }
-
-/*
-same but Different way of writing
-
-node *getIntersectionNode(node *headA, node *headB) {
-    node *ptrA = headA;
-    node *ptrB = headB;
-
-    while (ptrA != ptrB) {
-        if (ptrA != nullptr) {
-            ptrA = ptrA->next;
-        } else {
-            ptrA = headB;
-        }
-
-        if (ptrB != nullptr) {
-            ptrB = ptrB->next;
-        } else {
-            ptrB = headA;
-        }
-    }
-
-    return ptrA;
-}
-*/ 
 
 int main(){
 
-    LinkedList listA; 
-    listA.insertAtTail(1);
-    listA.insertAtTail(9);
-    listA.insertAtTail(1);
-    listA.insertAtTail(2);
-    listA.insertAtTail(4);
+    // Example usage:
+    // Creating two intersecting linked lists for demonstration:
+    // List A: 1 -> 2 \
+    //                  3 -> 4 -> 5
+    // List B:    6  /
 
-    LinkedList listB;
-    listB.insertAtTail(3);
-    listB.insertAtTail(2);
-    listB.insertAtTail(4);
+    node* common = new node(3);
+    common->next = new node(4);
+    common->next->next = new node(5);
 
-    node *temp = listB.head;
-    // Move to the intersection node
-    while(temp->next != nullptr){
-        temp = temp->next;
+    node* headA = new node(1);
+    headA->next = new node(2);
+    headA->next->next = common;
+
+    node* headB = new node(6);
+    headB->next = common;
+
+    node* intersection = getIntersectionNode(headA, headB);
+    if (intersection) {
+        cout << "Intersected at '" << intersection->data << "'" << endl;
     }
-    temp->next = listA.head->next->next->next; // make the list intersect
-
-    cout<<"List A: ";
-    listA.display();
-
-    cout<<"List B: ";
-    listB.display();
-
-    node *intersection = getIntersectionNode(listA.head, listB.head);
-    if(intersection){
-        cout<<"Intersection node is: "<<intersection->value<<endl;
+    else {
+        cout << "No intersection" << endl;
     }
-    else{
-        cout<<"No intersection"<<endl;
-    }
-    
+
     return 0;
 }
