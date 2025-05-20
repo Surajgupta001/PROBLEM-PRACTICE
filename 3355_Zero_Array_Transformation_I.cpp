@@ -50,6 +50,8 @@ queries[i].length == 2
 0 <= li <= ri < nums.length
 */
 
+// Approach -> Using Difference Array Technique
+
 #include <iostream>
 #include <vector>
 using namespace std;
