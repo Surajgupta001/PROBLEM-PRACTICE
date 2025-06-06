@@ -24,12 +24,14 @@ Output: "makkek"
 Explanation: Based on the equivalency information in s1 and s2, we can group their characters as [m,p], [a,o], [k,r,s], [e,i].
 The characters in each group are equivalent and sorted in lexicographical order.
 So the answer is "makkek".
+
 Example 2:
 
 Input: s1 = "hello", s2 = "world", baseStr = "hold"
 Output: "hdld"
 Explanation: Based on the equivalency information in s1 and s2, we can group their characters as [h,w], [d,e,o], [l,r].
 So only the second letter 'o' in baseStr is changed to 'd', the answer is "hdld".
+
 Example 3:
 
 Input: s1 = "leetcode", s2 = "programs", baseStr = "sourcecode"
@@ -49,60 +51,128 @@ s1, s2, and baseStr consist of lowercase English letters.
 #include <vector>
 #include <algorithm>
 #include <unordered_map>
+#include <queue>
 using namespace std;
 
-char DFS(unordered_map<char, vector<char>> &adj, char curr, vector<int> &visited)
-{
-    visited[curr - 'a'] = 1;
+// By using DFS 
+char dfsFindMinChar (unordered_map<char, vector<char>>& graph, char curr_Char, vector<int>& visited) {
+    visited[curr_Char - 'a'] = 1; // Mark this character as visited
 
-    char minChar = curr;
+    char minChar = curr_Char; // Initialize minChar with the current character
 
-    for (char &v : adj[curr])
-    {
-
-        if (visited[v - 'a'] == 0)
-            minChar = min(minChar, DFS(adj, v, visited));
+    for(auto& neighbor : graph[curr_Char]) {
+        if(!visited[neighbor - 'a']) { // If neighbor is not visited
+            char neighborMinChar = dfsFindMinChar(graph, neighbor, visited);
+            minChar = min(minChar, neighborMinChar); // Update minChar with the minimum found
+        }
     }
+    return minChar; // Return the minimum character found in the connected component
+}
 
+// By using BFS
+char bfsFindMinChar(unordered_map<char, vector<char>>& graph, char startChar) {
+    vector<int> visited(26, 0);
+    queue<char> qu;
+    char minChar = startChar;
+
+    qu.push(startChar);
+    visited[startChar - 'a'] = 1;
+
+    while (!qu.empty()) {
+        char curr = qu.front();
+        qu.pop();
+        minChar = min(minChar, curr);
+
+        for (auto& neighbor : graph[curr]) {
+            if (!visited[neighbor - 'a']) {
+                visited[neighbor - 'a'] = 1;
+                qu.push(neighbor);
+            }
+        }
+    }
     return minChar;
 }
 
-string smallestEquivalentString(string s1, string s2, string baseStr)
-{
-    int n = s1.length();
-    unordered_map<char, vector<char>> adj;
+int find(vector<int>& parent, int x) {
+    // Path compression
+    return parent[x] = (parent[x] == x) ? x : find(parent, parent[x]);
+}
 
-    for (int i = 0; i < n; i++)
-    {
-        char u = s1[i];
-        char v = s2[i];
+void Union(vector<int>& parent, vector<int>& rank, int a, int b) {
+    a = find(parent, a);
+    b = find(parent, b);
+    if (a == b) return;
+    // Always attach the higher lexicographical root to the lower one
+    if (a < b) {
+        parent[b] = a;
+    }
+    else {
+        parent[a] = b;
+    }
+    // Rank is not strictly necessary here, but can be kept for completeness
+    if (rank[a] == rank[b]) rank[a]++;
+}
 
-        adj[u].push_back(v);
-        adj[v].push_back(u);
+// By using DSU
+string smallestEquivalentString(string s1, string s2, string baseStr) {
+    vector<int> parent(26);
+    vector<int> rank(26, 0);
+    for (int i = 0; i < 26; ++i) parent[i] = i;
+
+    // Union the equivalence relations
+    for (int i = 0; i < s1.size(); ++i) {
+        Union(parent, rank, s1[i] - 'a', s2[i] - 'a');
     }
 
-    int m = baseStr.length();
+    // Build the result string
     string result;
+    for (char ch : baseStr) {
+        int root = find(parent, ch - 'a');
+        result.push_back('a' + root);
+    }
+    return result;
+}
 
-    for (int i = 0; i < m; i++)
-    {
+string smallestEquivalentString(string s1, string s2, string baseStr) {
+    int n = s1.size();
+    int m = baseStr.size();
+
+    // Build Graph
+    unordered_map<char, vector<char>> graph;
+    for(int i=0; i<n; i++){
+        int u = s1[i];
+        int v = s2[i];
+        graph[u].push_back(v);
+        graph[v].push_back(u);
+    }
+
+    string result;
+    for(int i=0; i<m; i++){
         char ch = baseStr[i];
 
-        vector<int> visited(26, 0);
+        vector<int> visited(26, 0); // For this ch, none is visited yet
+        char minChar = dfsFindMinChar(graph, ch, visited);
+        // Alternatively, you can use BFS
+        // char minChar = bfsFindMinChar(graph, ch);
 
-        result.push_back(DFS(adj, ch, visited));
+        result.push_back(minChar);
     }
 
     return result;
 }
 
-int main()
-{
-    string s1 = "parker";
-    string s2 = "morris";
-    string baseStr = "parser";
 
+
+int main () {
+
+    string s1 = "parker", s2 = "morris", baseStr = "parser";
     cout << smallestEquivalentString(s1, s2, baseStr) << endl; // Output: "makkek"
+
+    s1 = "hello", s2 = "world", baseStr = "hold";
+    cout << smallestEquivalentString(s1, s2, baseStr) << endl; // Output: "hdld"
+
+    s1 = "leetcode", s2 = "programs", baseStr = "sourcecode";
+    cout << smallestEquivalentString(s1, s2, baseStr) << endl; // Output: "aauaaaaada"
 
     return 0;
 }
