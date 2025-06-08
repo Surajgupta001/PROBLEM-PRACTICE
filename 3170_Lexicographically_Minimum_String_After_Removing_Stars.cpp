@@ -79,6 +79,64 @@ string clearStars(string s) {
     return result;
 }
 
+/*
+==================== Custom Comparator By using function ================
+#include <iostream>
+#include <string>
+#include <queue>
+using namespace std;
+
+// Comparator function for priority_queue
+bool custom_comparator(const pair<char, int>& p1, const pair<char, int>& p2) {
+    if (p1.first == p2.first) {
+        return p1.second < p2.second;
+    }
+    return p1.first > p2.first;
+}
+
+// Function to remove all '*' and the smallest character to the left of each '*'
+string clearStars(string s) {
+    int n = s.length();
+
+    // Use function pointer as comparator
+    priority_queue<pair<char, int>, vector<pair<char, int>>, bool(*)(const pair<char, int>&, const pair<char, int>&)> pq(custom_comparator);
+
+    // Traverse the string
+    for(int i = 0; i < n; i++){
+        if(s[i] != '*') {
+            // Push non-'*' characters with their indices into the priority queue
+            pq.push({s[i], i});
+        }
+        else {
+            // For '*', remove the smallest character to its left
+            int idx = pq.top().second;
+            pq.pop();
+            s[idx] = '*'; // Mark the character to be removed
+        }
+    }
+
+    // Build the result string without '*' characters
+    string result = "";
+    for(int i = 0; i < n; i++) {
+        if(s[i] != '*') {
+            result.push_back(s[i]);
+        }
+    }
+    return result;
+}
+
+int main() {
+    string s;
+    cout << "Enter the string: ";
+    cin >> s;
+
+    string result = clearStars(s);
+    cout << "Resulting string after removing stars: " << result << endl;
+
+    return 0;
+}
+*/ 
+
 int main() {
     string s;
     cout << "Enter the string: ";
