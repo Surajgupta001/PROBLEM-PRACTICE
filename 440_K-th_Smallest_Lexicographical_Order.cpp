@@ -21,8 +21,71 @@ Constraints:
 */ 
 
 #include <iostream>
+#include <vector>
 using namespace std;
 
+//Approach-1 (Simple Recursion - DFS) - MEMORY LIMIT EXCEEDE (MLE)
+void helper(int curr, int n, vector<int> &result){
+    if (curr > n) return;
+
+    result.push_back(curr);
+
+    for (int nextDigit = 0; nextDigit <= 9; nextDigit++){
+        int nextnum = curr * 10 + nextDigit;
+
+        if (nextnum > n) return;
+
+        helper(nextnum, n, result);
+    }
+}
+
+int findKthNumber(int n, int k){
+    vector<int> result;
+
+    for (int num = 1; num <= 9; num++){
+        helper(num, n, result);
+    }
+
+    return result[k - 1];
+}
+
+//Approach-2 (Simple Recursion - DFS without storing in result) - TIME LIMIT EXCEEDE (TLE)
+int count = 0;
+int result = 0;
+
+bool helper(long long curr, int n, int k){
+    if (curr > n) return false;
+
+    count++;
+
+    if (count == k){
+        result = curr;
+        return true;
+    }
+
+    for (int nextDigit = 0; nextDigit <= 9; nextDigit++){
+        long long nextnum = curr * 10 + nextDigit;
+        if (nextnum > n) break;
+
+        if (helper(nextnum, n, k)){
+            return true;
+        }
+    }
+
+    return false;
+}
+
+int findKthNumber(int n, int k){
+    for (long long num = 1; num <= 9; num++){
+        if (helper(num, n, k)){
+            break;
+        }
+    }
+
+    return result;
+}
+
+// Approach-3 (Optimal) - ACCEPTED
 /*
 Time Complexity: O((log₁₀(n))²)
 Space Complexity: O(1)
