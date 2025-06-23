@@ -45,20 +45,33 @@ fill is a lowercase English letter.
 using namespace std;
 
 vector<string> divideString(string s, int k, char fill){
-    vector<string> result;
     int n = s.length();
+    vector<string> result;
 
     int i = 0;
-    while (i < n){
-        int j = (i + k - 1 >= n) ? n - 1 : (i + k - 1);
-        string temp = s.substr(i, j - i + 1);
-
-        if (j - i + 1 < k){
-            int remain = k - (j - i + 1);
+    while(i < n) {
+        int j = (i+k-1 >= n) ? n-1 : i+k-1; // Determine the end index of the current group
+        string temp = s.substr(i, j-i+1);
+        if(j-i+1 < k) {
+            int remain = k - (j-i+1);
             temp += string(remain, fill);
         }
         result.push_back(temp);
         i += k;
     }
     return result;
+}
+
+int main () {
+    string s = "abcdefghij";
+    int k = 3;
+    char fill = 'x';
+    
+    vector<string> result = divideString(s, k, fill);
+    
+    for(const auto &group : result) {
+        cout << group << " ";
+    }
+    
+    return 0;
 }
