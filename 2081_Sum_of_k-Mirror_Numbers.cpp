@@ -58,73 +58,78 @@ Constraints:
 #include <algorithm>
 using namespace std;
 
-bool isPalindrome(string baseK){
-    int i = 0;
-    int j = baseK.length() - 1;
-
-    while (i <= j){
-        if (baseK[i] != baseK[j]){
-            return false;
-        }
-        i++;
-        j--;
-    }
-
-    return true;
-}
-
-string convertToBaseK(long long num, int k){
-    if (num == 0){
-        return "0";
-    }
-
-    string res = "";
-    while (num > 0){
-        res += to_string(num % k);
+// Function to convert a number to base k
+string convertToBaseK(long long num, int k) {
+    if (num == 0) return "0"; // Handle the case for zero
+    string result = "";
+    while (num > 0) {
+        result += to_string(num % k);
         num /= k;
     }
-
-    return res;
+    reverse(result.begin(), result.end()); // Reverse to get the correct order
+    return result;
 }
 
-long long kMirror(int k, int n){
+// Function to check if a string is a palindrome
+bool isPalindrome(const string &baseK) {
+    int left = 0;
+    int right = baseK.size() - 1;
+    
+    while (left < right) {
+        if (baseK[left] != baseK[right]) return false; // If characters don't match, it's not a palindrome
+        left++;
+        right--;
+    }
+    return true; // If all characters match, it'baseK a palindrome
+}
+
+
+long long kMirror (int k, int n ) {
     long long sum = 0;
-    int L = 1; // create L length palindromes
+    int length = 1; // Create L length plindromes
 
-    while (n > 0){
-        int half_length = (L + 1) / 2;
+    while(n > 0) {
+        int half_length = (length + 1) / 2; // Half length of the palindrome
 
-        long long min_num = pow(10, half_length - 1);
-        long long max_num = pow(10, half_length) - 1;
+        long long min_num = pow(10, half_length - 1); // Minimum half palindrome
+        long long max_num = pow(10, half_length) - 1; // Maximum half palindrome
 
-        for (int num = min_num; num <= max_num; num++){
+        for(int num = min_num; num <= max_num; num++) {
             string first_half = to_string(num);
             string second_half = first_half;
-            reverse(begin(second_half), end(second_half));
+            reverse(second_half.begin(), second_half.end()); // Create the second half of the palindrome
 
-            string pal = "";
-            if (L % 2 == 0){ // even length palindrome
-                pal = first_half + second_half;
+            string palindrome_str = "";
+            if(length % 2 == 0) {
+                palindrome_str = first_half + second_half; // Even length palindrome
+            } else {
+                palindrome_str = first_half + second_half.substr(1); // Odd length palindrome
             }
-            else{ // off length palindrome
-                pal = first_half + second_half.substr(1);
+
+            long long palindrome_num = stoll(palindrome_str); // Convert to long long
+
+            string baseK = convertToBaseK(palindrome_num, k); // Convert to base k
+
+            if(isPalindrome(baseK)) { // Check if it's a k-mirror number
+                sum += palindrome_num; // Add to the sum and found one k-mirror number
+                n--; // Decrease the count of k-mirror numbers found
+                if(n == 0) break; // Stop if we found enough k-mirror numbers
             }
-
-            long long pal_num = stoll(pal);
-
-            string baseK = convertToBaseK(pal_num, k);
-
-            if (isPalindrome(baseK)){
-                sum += pal_num; // found one k-mirror number
-                n--;
-                if (n == 0){
-                    break;
-                }
-            }
-        }
-
-        L++;
+        } 
+        length++; // Increase the length of the palindrome
     }
+    return sum; // Return the total sum of k-mirror numbers
+}
 
-    return sum;
+int main() {
+    int k, n;
+    cout << "Enter base k (2 <= k <= 9): ";
+    cin >> k;
+    cout << "Enter number of k-mirror numbers n (1 <= n <= 30): ";
+    cin >> n;
+
+    long long result = kMirror(k, n);
+    cout << "Sum of the " << n << " smallest k-mirror numbers in base " << k << " is: " << result << endl;
+
+    return 0;
 }
