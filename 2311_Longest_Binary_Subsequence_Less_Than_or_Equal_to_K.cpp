@@ -38,7 +38,27 @@ s[i] is either '0' or '1'.
 #include <string>
 using namespace std;
 
-int longestSubsequence(string s, int k){
+// Recursion Approach
+int helper(const string& str, int k, int idx, int n){
+    if(idx == n) return 0; // Base case: reached the end of the string
+
+    int take = 0;
+    int bit = str[idx] - '0'; // Convert character to integer (0 or 1)
+    long long value = (bit == 1 ? (1LL << (n - idx - 1)) : 0); // Calculate the value of the current bit in its position
+
+    // If we take the current bit
+    if(value <= k){
+        take = 1 + helper(str, k - value, idx + 1, n); // Include this bit and reduce k accordingly
+    }
+
+    // If we don't take the current bit
+    int skip = helper(str, k, idx + 1, n);
+
+    return max(take, skip);
+}
+
+// Optimal Approach - Greedy Approach
+int longestSubsequence(const string &s, int k){
     int length = 0;
     long long powerValue = 1;
 
@@ -55,4 +75,16 @@ int longestSubsequence(string s, int k){
     }
 
     return length;
+}
+
+int longestSubsequence(const string& s, int k){
+    int n = s.length();
+    return helper(s, k, 0, n);
+}
+
+int main() {
+    string s = "1001010";
+    int k = 5;
+    cout << longestSubsequence(s, k) << endl;
+    return 0;
 }
