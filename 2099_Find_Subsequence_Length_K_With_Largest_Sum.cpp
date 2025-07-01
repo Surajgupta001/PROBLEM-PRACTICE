@@ -100,3 +100,7 @@ vector<int> maxSubsequence(vector<int>& nums, int k) {
     }
     return result;
 }
+
+int main(){
+    
+}
