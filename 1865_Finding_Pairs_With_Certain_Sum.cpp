@@ -48,29 +48,47 @@ At most 1000 calls are made to add and count each.
 #include <vector>
 #include <unordered_map>
 using namespace std;
+class FindSumPairs {
+private:
+    vector<int> vec1, vec2; // Store the first and second arrays
+    unordered_map<int, int> freqMap; // Map to store the frequency of elements in vec2
 
-vector<int> vec1, vec2;
-    unordered_map<int, int> mp;
-
+public:
     FindSumPairs(vector<int>& nums1, vector<int>& nums2) {
-        vec1 = nums1;
-        vec2 = nums2;
-        for(int &x : vec2) {
-            mp[x]++;
+        vec1 = nums1; // Initialize vec1 with nums1
+        vec2 = nums2; // Initialize vec2 with nums2
+        for (int num : vec2) { // Populate the frequency map with elements from vec2
+            freqMap[num]++;
         }
     }
-    
-    void add(int index, int val) {
-        mp[vec2[index]]--;
-        vec2[index] += val;
-        mp[vec2[index]]++;
-    }
-    
-    int count(int tot) {
-        int c = 0;
-        for(int &x : vec1) {
-            c += mp[tot-x];
-        }
 
-        return c;
+    void add(int index, int value) {
+        freqMap[vec2[index]]--; // Decrease the frequency of the old value
+        vec2[index] += value; // Update the value at the index
+        freqMap[vec2[index]]++; // Increase the frequency of the new value
     }
+
+    int count(int total) {
+        int count = 0; // Initialize count of pairs to 0
+        for (int num : vec1) { // Iterate through each element in vec1
+            count += freqMap[total - num]; // For each num in vec1, find how many times (total - num) appears in vec2
+        }
+        return count;
+    }
+};
+
+int main() {
+    vector<int> nums1 = {1, 1, 2, 2, 2, 3};
+    vector<int> nums2 = {1, 4, 5, 2, 5, 4};
+    FindSumPairs findSumPairs(nums1, nums2);
+
+    cout << findSumPairs.count(7) << endl; // Output: 8
+    findSumPairs.add(3, 2);
+    cout << findSumPairs.count(8) << endl; // Output: 2
+    cout << findSumPairs.count(4) << endl; // Output: 1
+    findSumPairs.add(0, 1);
+    findSumPairs.add(1, 1);
+    cout << findSumPairs.count(7) << endl; // Output: 11
+
+    return 0;
+}
