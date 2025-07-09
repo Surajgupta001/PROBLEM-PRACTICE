@@ -59,7 +59,7 @@ int helper(const vector<vector<int>>& events, int idx, int k, vector<vector<int>
     return dp[idx][k] = max(skip, take);
 }
 
-int maxValueLinear(vector<vector<int>>& events, int k) {
+int maxValue(vector<vector<int>>& events, int k) {
     sort(events.begin(), events.end());
     int n = events.size();
     vector<vector<int>> dp(n, vector<int>(k + 1, -1));
@@ -88,7 +88,7 @@ int helper(const vector<vector<int>>& events, int idx, int k, vector<vector<int>
     return dp[idx][k] = max(skip, take);
 }
 
-int maxValueBinary(vector<vector<int>>& events, int k) {
+int maxValue(vector<vector<int>>& events, int k) {
     sort(events.begin(), events.end());
     int n = events.size();
     vector<vector<int>> dp(n, vector<int>(k + 1, -1));
@@ -100,8 +100,7 @@ int main() {
     vector<vector<int>> events = {{1, 2, 4}, {3, 4, 3}, {2, 3, 1}};
     int k = 2;
 
-    cout << "Linear Search Approach: " << maxValueLinear(events, k) << endl;
-    cout << "Binary Search Approach: " << maxValueBinary(events, k) << endl;
+    cout << "Linear Search Approach: " << maxValue(events, k) << endl;
 
     return 0;
 }
