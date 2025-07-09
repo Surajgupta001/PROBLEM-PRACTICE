@@ -39,86 +39,69 @@ Constraints:
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#include <climits>
 using namespace std;
 
-// Linear search approach with memoization
-int helper(vector<vector<int>>& events, int idx, int k, int n, vector<vector<int>>& dp) {
-    if (idx >= n || k <= 0) {
-        return 0;
-    }
+// ----------- Linear Search Approach -----------
+int helper(const vector<vector<int>>& events, int idx, int k, vector<vector<int>>& dp) {
+    if (idx == events.size() || k == 0) return 0;
+    if (dp[idx][k] != -1) return dp[idx][k];
 
-    if (dp[idx][k] != -1) {
-        return dp[idx][k];
-    }
+    // Skip current event
+    int skip = helper(events, idx + 1, k, dp);
 
-    int startingDay = events[idx][0]; // Starting day of the current event
-    int endingDay = events[idx][1]; // Ending day of the current event
-    int value = events[idx][2]; // Value of the current event
+    // Find next event that starts after current event ends (linear search)
+    int nextIdx = idx + 1;
+    while (nextIdx < events.size() && events[nextIdx][0] <= events[idx][1]) nextIdx++;
 
-    int skip = helper(events, idx + 1, k, n, dp); // Skip the current event
+    // Take current event
+    int take = events[idx][2] + helper(events, nextIdx, k - 1, dp);
 
-    // Take the current event -> Linear search
-    int j = idx + 1;
-    for(; j < n ; j++) {
-        if (events[j][0] > endingDay) { // Find the next event that starts after the current event ends
-            break;
+    return dp[idx][k] = max(skip, take);
+}
+
+int maxValueLinear(vector<vector<int>>& events, int k) {
+    sort(events.begin(), events.end());
+    int n = events.size();
+    vector<vector<int>> dp(n, vector<int>(k + 1, -1));
+    return helper(events, 0, k, dp);
+}
+
+// ----------- Binary Search Approach -----------
+int helper(const vector<vector<int>>& events, int idx, int k, vector<vector<int>>& dp) {
+    if (idx == events.size() || k == 0) return 0;
+    if (dp[idx][k] != -1) return dp[idx][k];
+
+    // Skip current event
+    int skip = helper(events, idx + 1, k, dp);
+
+    // Find next event that starts after current event ends (binary search)
+    int nextIdx = upper_bound(
+        events.begin() + idx + 1, events.end(), events[idx][1],
+        [](int endDay, const vector<int>& event) {
+            return endDay < event[0];
         }
-    }
+    ) - events.begin();
 
-    int take = value + helper(events, j, k - 1, n, dp); // Take the current event and move to the next non-overlapping event
+    // Take current event
+    int take = events[idx][2] + helper(events, nextIdx, k - 1, dp);
 
-    return dp[idx][k] = max(skip, take); // Return the maximum of skipping or taking the current event
+    return dp[idx][k] = max(skip, take);
 }
 
-int maxValue(vector<vector<int>>& events, int k) {
+int maxValueBinary(vector<vector<int>>& events, int k) {
     sort(events.begin(), events.end());
     int n = events.size();
-    
-    vector<vector<int>> dp(n, vector<int>(k + 1, -1)); // Initialize the DP table with -1
-
-    return helper(events, 0, k, n, dp);
+    vector<vector<int>> dp(n, vector<int>(k + 1, -1));
+    return helper(events, 0, k, dp);
 }
 
-// Binary search approach to reduce the time complexity
-int helper(vector<vector<int>>& events, int idx, int k, int n, vector<vector<int>>& dp) {
-    if (idx >= n || k <= 0) {
-        return 0;
-    }
-
-    if (dp[idx][k] != -1) {
-        return dp[idx][k];
-    }
-
-    int startingDay = events[idx][0]; // Starting day of the current event
-    int endingDay = events[idx][1]; // Ending day of the current event
-    int value = events[idx][2]; // Value of the current event
-
-    int skip = helper(events, idx + 1, k, n, dp); // Skip the current event
-
-    // Take the current event -> Binary search
-    int j = upper_bound(events.begin() + idx + 1, events.end(), vector<int>{endingDay, INT_MAX, INT_MAX}) - events.begin(); // Find the next event that starts after the current event ends
-
-    int take = value + helper(events, j, k - 1, n, dp); // Take the current event and move to the next non-overlapping event
-
-    return dp[idx][k] = max(skip, take); // Return the maximum of skipping or taking the current event
-}
-
-int maxValue(vector<vector<int>>& events, int k) {
-    sort(events.begin(), events.end());
-    int n = events.size();
-    
-    vector<vector<int>> dp(n, vector<int>(k + 1, -1)); // Initialize the DP table with -1
-
-    return helper(events, 0, k, n, dp);
-}
-
-int main () {
+// ----------- Main Function -----------
+int main() {
     vector<vector<int>> events = {{1, 2, 4}, {3, 4, 3}, {2, 3, 1}};
     int k = 2;
 
-    int result = maxValue(events, k);
-    cout << "Maximum sum of values that can be received by attending events: " << result << endl;
+    cout << "Linear Search Approach: " << maxValueLinear(events, k) << endl;
+    cout << "Binary Search Approach: " << maxValueBinary(events, k) << endl;
 
     return 0;
 }
