@@ -11,27 +11,22 @@ Return the maximum sum of values that you can receive by attending events.
 
 Example 1:
 
-
-
 Input: events = [[1,2,4],[3,4,3],[2,3,1]], k = 2
 Output: 7
 Explanation: Choose the green events, 0 and 1 (0-indexed) for a total value of 4 + 3 = 7.
+
 Example 2:
-
-
 
 Input: events = [[1,2,4],[3,4,3],[2,3,10]], k = 2
 Output: 10
 Explanation: Choose event 2 for a total value of 10.
 Notice that you cannot attend any other event as they overlap, and that you do not have to attend k events.
+
 Example 3:
-
-
 
 Input: events = [[1,1,1],[2,2,2],[3,3,3],[4,4,4]], k = 3
 Output: 9
 Explanation: Although the events do not overlap, you can only attend 3 events. Pick the highest valued three.
- 
 
 Constraints:
 
@@ -44,35 +39,86 @@ Constraints:
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <climits>
 using namespace std;
 
-class Solution {
-    vector<vector<int>> mem;
-    vector<int> next_event;
-    int n;
-
-    int attendEvent(vector<vector<int>>& events,int pos,int k){
-        if(k==0 or pos>=n)
-            return 0;
-        if(mem[pos][k]!=-1)
-            return mem[pos][k];
-        
-        int skip_event = attendEvent(events,pos+1,k);
-
-        int next = next_event[pos];
-        int attend_event = attendEvent(events,next,k-1) + events[pos][2];
-        return mem[pos][k] = max(skip_event,attend_event);
+// Linear search approach with memoization
+int helper(vector<vector<int>>& events, int idx, int k, int n, vector<vector<int>>& dp) {
+    if (idx >= n || k <= 0) {
+        return 0;
     }
-public:
-    int maxValue(vector<vector<int>>& events, int k) {
-        n = events.size();
-        sort(events.begin(),events.end());
-        mem.assign(n,vector<int>(k+1,-1));
 
-        next_event = vector<int>(n);
-        for(int i=0;i<n;++i)
-            next_event[i] = upper_bound(events.begin()+i,events.end(),vector<int>{events[i][1]+1,0,0})-events.begin();
-        
-        return attendEvent(events,0,k);
+    if (dp[idx][k] != -1) {
+        return dp[idx][k];
     }
-};
+
+    int startingDay = events[idx][0]; // Starting day of the current event
+    int endingDay = events[idx][1]; // Ending day of the current event
+    int value = events[idx][2]; // Value of the current event
+
+    int skip = helper(events, idx + 1, k, n, dp); // Skip the current event
+
+    // Take the current event -> Linear search
+    int j = idx + 1;
+    for(; j < n ; j++) {
+        if (events[j][0] > endingDay) { // Find the next event that starts after the current event ends
+            break;
+        }
+    }
+
+    int take = value + helper(events, j, k - 1, n, dp); // Take the current event and move to the next non-overlapping event
+
+    return dp[idx][k] = max(skip, take); // Return the maximum of skipping or taking the current event
+}
+
+int maxValue(vector<vector<int>>& events, int k) {
+    sort(events.begin(), events.end());
+    int n = events.size();
+    
+    vector<vector<int>> dp(n, vector<int>(k + 1, -1)); // Initialize the DP table with -1
+
+    return helper(events, 0, k, n, dp);
+}
+
+// Binary search approach to reduce the time complexity
+int helper(vector<vector<int>>& events, int idx, int k, int n, vector<vector<int>>& dp) {
+    if (idx >= n || k <= 0) {
+        return 0;
+    }
+
+    if (dp[idx][k] != -1) {
+        return dp[idx][k];
+    }
+
+    int startingDay = events[idx][0]; // Starting day of the current event
+    int endingDay = events[idx][1]; // Ending day of the current event
+    int value = events[idx][2]; // Value of the current event
+
+    int skip = helper(events, idx + 1, k, n, dp); // Skip the current event
+
+    // Take the current event -> Binary search
+    int j = upper_bound(events.begin() + idx + 1, events.end(), vector<int>{endingDay, INT_MAX, INT_MAX}) - events.begin(); // Find the next event that starts after the current event ends
+
+    int take = value + helper(events, j, k - 1, n, dp); // Take the current event and move to the next non-overlapping event
+
+    return dp[idx][k] = max(skip, take); // Return the maximum of skipping or taking the current event
+}
+
+int maxValue(vector<vector<int>>& events, int k) {
+    sort(events.begin(), events.end());
+    int n = events.size();
+    
+    vector<vector<int>> dp(n, vector<int>(k + 1, -1)); // Initialize the DP table with -1
+
+    return helper(events, 0, k, n, dp);
+}
+
+int main () {
+    vector<vector<int>> events = {{1, 2, 4}, {3, 4, 3}, {2, 3, 1}};
+    int k = 2;
+
+    int result = maxValue(events, k);
+    cout << "Maximum sum of values that can be received by attending events: " << result << endl;
+
+    return 0;
+}
