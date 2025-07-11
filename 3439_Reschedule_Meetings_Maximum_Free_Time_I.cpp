@@ -66,38 +66,63 @@ endTime[i] <= startTime[i + 1] where i lies in the range [0, n - 2].
 #include <vector>
 using namespace std;
 
-int maxFreeTime(int eventTime, int k, vector<int>& startTime, vector<int>& endTime) {
-        vector<int> freeArray; //store durations of free gaps
+int maxFreeTime(int eventTime, int k, vector<int> &startTime, vector<int> &endTime) {
+    vector<int> freeArray; // store durations of free gaps
 
-        //ith event
-        //ith start - i-1th ka end = free gap duration
-        freeArray.push_back(startTime[0]);
+    // ith event
+    // ith start - i-1th ka end = free gap duration
+    freeArray.push_back(startTime[0]);
 
-        for(int i = 1; i < startTime.size(); i++) {
-            freeArray.push_back(startTime[i] - endTime[i-1]);
-        }
-
-        freeArray.push_back(eventTime - endTime[endTime.size()-1]);
-
-        //Khandani sliding window
-
-        int i = 0;
-        int j = 0;
-        int maxSum = 0;
-        int currSum = 0;
-
-        int n = freeArray.size();
-        while(j < n) {
-            currSum += freeArray[j];
-
-            if(i < n && j-i+1 > k+1) {
-                currSum -= freeArray[i];
-                i++;
-            }
-
-            maxSum = max(maxSum, currSum);
-            j++;
-        }
-
-        return maxSum;
+    for (int i = 1; i < startTime.size(); i++) {
+        freeArray.push_back(startTime[i] - endTime[i - 1]);
     }
+
+    freeArray.push_back(eventTime - endTime[endTime.size() - 1]);
+
+    // Khandani sliding window
+
+    int i = 0;
+    int j = 0;
+    int maxSum = 0;
+    int currSum = 0;
+
+    int n = freeArray.size();
+    while (j < n) {
+        currSum += freeArray[j];
+
+        if (i < n && j - i + 1 > k + 1) {
+            currSum -= freeArray[i];
+            i++;
+        }
+
+        maxSum = max(maxSum, currSum);
+        j++;
+    }
+
+    return maxSum;
+}
+
+int main () {
+    int eventTime = 5;
+    int k = 1;
+    vector<int> startTime = {1, 3};
+    vector<int> endTime = {2, 5};
+
+    cout << maxFreeTime(eventTime, k, startTime, endTime) << endl; // Output: 2
+
+    eventTime = 10;
+    k = 1;
+    startTime = {0, 2, 9};
+    endTime = {1, 4, 10};
+
+    cout << maxFreeTime(eventTime, k, startTime, endTime) << endl; // Output: 6
+
+    eventTime = 5;
+    k = 2;
+    startTime = {0, 1, 2, 3, 4};
+    endTime = {1, 2, 3, 4, 5};
+
+    cout << maxFreeTime(eventTime, k, startTime, endTime) << endl; // Output: 0
+
+    return 0;
+}
