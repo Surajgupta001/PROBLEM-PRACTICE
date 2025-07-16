@@ -47,25 +47,25 @@ using namespace std;
 //S.C : O(1)
 vector<int> maxSubsequence(vector<int> &nums, int k){
     int n = nums.size();
-    if (k == n) return nums;
+    if (k == n) return nums; // If k equals the size of nums, return nums as is.
     
-    vector<pair<int, int>> vec(n);
+    vector<pair<int, int>> vec(n); // Create a vector of pairs to store indices and values
     
     for (int i = 0; i < n; i++){
-        vec[i] = make_pair(i, nums[i]);
+        vec[i] = make_pair(i, nums[i]); // Store the index and value in the pair
     }
 
-    auto lambda = [](auto &p1, auto &p2){
+    auto lambda = [](auto &p1, auto &p2){ // Custom comparator to sort by value
         return p1.second > p2.second;
     };
     
-    sort(begin(vec), end(vec), lambda);
-    sort(begin(vec), begin(vec) + k);
+    sort(begin(vec), end(vec), lambda); // Sort the vector of pairs based on values in descending order
+    sort(begin(vec), begin(vec) + k); // Sort the first k elements by their original indices to maintain order in the result
     
     
     vector<int> result;
     for (int i = 0; i < k; i++){
-        result.push_back(vec[i].second);
+        result.push_back(vec[i].second); // Push the values of the first k elements into the result vector
     }
     
     return result;
@@ -103,4 +103,16 @@ vector<int> maxSubsequence(vector<int>& nums, int k) {
 
 int main(){
     
+    vector<int> nums = {2, 1, 3, 3};
+    int k = 2;
+    
+    vector<int> result = maxSubsequence(nums, k);
+    
+    cout << "Subsequence of length " << k << " with the largest sum: ";
+    for (int num : result) {
+        cout << num << " ";
+    }
+    cout << endl;
+
+    return 0;
 }
