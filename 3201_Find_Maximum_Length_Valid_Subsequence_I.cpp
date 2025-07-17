@@ -55,7 +55,10 @@ Constraints:
 using namespace std;
 
 int maximumLength(vector<int> &nums){
-    int countEven = 0, countOdd = 0;
+    
+    int countEven = 0;
+    int countOdd = 0;
+    
     for(int num : nums){
         if (num % 2 == 0) countEven++;
         else countOdd++;
