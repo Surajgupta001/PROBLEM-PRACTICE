@@ -40,29 +40,75 @@ Each folder name is unique.
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <unordered_set>
 using namespace std;
 
-class Solution {
-public:
-    vector<string> removeSubfolders(vector<string>& folder) {
-        sort(begin(folder), end(folder));
-        vector<string> result;
+// Approach: 1 - Using a set to track folders and checking for subfolders
+// Time Complexity: O(n * m^2) where n is the number of folders and m is the average length of the folder names
+vector<string> removeSubfolders(vector<string>& folder){ // T.C => O(n) where n is the number of folders
+    
+    unordered_set<string> sets(folder.begin(), folder.end());
+    vector<string> result;
+    
+    for(auto &currFolder : folder){
+        bool isSubFolder = false;
 
-        result.push_back(folder[0]); //sorted hai islie folder[0] ka koi parent nahi hoga
-        //so it can never be a sub-folder
+        string originalFolder = currFolder;
+        
+        // Check if the current folder is a subfolder of any other folder
+        while(!currFolder.empty()){ // T.C => O(m) where m is the length of the folder name
+            size_t position_of_last_slash = currFolder.find_last_of('/'); // O(m) where m is the length of the folder name
 
-        for(int i = 1; i < folder.size(); i++) {
-
-            string currFolder = folder[i];
-            string lastFolder = result.back();
-            lastFolder += '/';
-
-            if(currFolder.find(lastFolder) != 0) {
-                result.push_back(currFolder);
+            currFolder = currFolder.substr(0, position_of_last_slash); // O(m) where m is the length of the folder name
+            if(sets.find(currFolder) != sets.end()){
+                // It means currFolder is a subfolder of some other folder
+                isSubFolder = true;
+                break;
             }
         }
 
-        return result;
-
+        if (!isSubFolder){
+            result.push_back(originalFolder);
+        }
     }
-};
+    return result;
+}
+
+// Approach: 2 - Sorting and checking for subfolders
+// Time Complexity: O(n * m log n) where n is the number of folders and m is the average length of the folder names
+vector<string> removeSubfolders(vector<string>& folder){
+    sort(folder.begin(), folder.end());
+    vector<string> result;
+
+    result.push_back(folder[0]); // It is sorted, so folder[0] has no parent folder
+    // So it can never be a subfolder of any other folder
+
+    for(int i = 1; i < folder.size(); i++){
+        
+        string currFolder = folder[i];
+        string lastAddedFolder = result.back();
+        lastAddedFolder += '/'; // Add a '/' to the end of the last added folder
+        
+        // Check if the current folder starts with the last added folder
+        if(currFolder.find(lastAddedFolder) != 0){ // If it does not start with the last added folder
+            result.push_back(currFolder); // It is not a subfolder of the last added folder
+        }
+    }
+    return result;
+}
+
+int main() {
+    vector<string> folder = {"/a", "/a/b", "/c/d", "/c/d/e", "/c/f"};
+    vector<string> result = removeSubfolders(folder);
+    
+    cout << "[";
+    for (int i = 0; i < result.size(); i++) {
+        cout << "\"" << result[i] << "\"";
+        if (i < result.size() - 1) {
+            cout << ",";
+        }
+    }
+    cout << "]" << endl;
+    
+    return 0;
+}
