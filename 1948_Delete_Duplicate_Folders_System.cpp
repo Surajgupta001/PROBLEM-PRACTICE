@@ -64,100 +64,123 @@ using namespace std;
 //Approach (Using trie)
 //T.C : O(N * L * ClogC), N = total Paths, L = average length of each path, C is the average number of children per node
 //S.C : ~O(N * L), we store all the paths in the trie, approximated value.
-class Solution {
-public:
-    struct Node {
-        string val; //name
-        string subFolder; //subfolder structure
-        unordered_map<string, Node*> children;
-    };
 
-    Node* getNode(string val) {
-        Node* temp = new Node();
-        temp->val = val;
-        temp->subFolder = "";
-
-        return temp;
-    }
-
-    void insert(Node* root, vector<string>& path) {
-        for(auto& folder : path) {
-            if(!root->children.count(folder)) {
-                root->children[folder] = getNode(folder);
-            }
-
-            root = root->children[folder];
-        }
-    }
-
-    string populateNodes(Node* root, unordered_map<string, int>& subFolderMap) {
-        vector<pair<string, string>> subFolderPaths;
-
-        for(auto it = root->children.begin(); it != root->children.end(); ++it) {
-            string subFolderResult = populateNodes(it->second, subFolderMap);
-            subFolderPaths.push_back({it->first, subFolderResult});
-        }
-
-        sort(begin(subFolderPaths), end(subFolderPaths));
-
-        string completePath = "";//this is the subfolder of current root which we will form from children paths
-        for(auto& p : subFolderPaths) {
-            completePath += "(" + p.first + p.second + ")";
-        }
-
-        root->subFolder = completePath;
-
-        if(!completePath.empty()) {
-            subFolderMap[completePath]++;
-        }
-
-        return completePath;
-    }
-
-    void removeDuplicates(Node* root, unordered_map<string, int>& subFolderMap) {
-        for(auto it = root->children.begin(); it != root->children.end(); ) {
-            string childName = it->first;
-            Node* child = it->second;
-
-            if(!child->subFolder.empty() && subFolderMap[child->subFolder] > 1) {
-                it = root->children.erase(it);
-            } else {
-                removeDuplicates(child, subFolderMap);
-                it++;
-            }
-        }
-    }
-
-    void construstResult(Node* root, vector<string>& path, vector<vector<string>>& result) {
-        for(auto it = root->children.begin(); it != root->children.end(); ++it) {
-            string childName = it->first;
-            Node* child = it->second;
-            path.push_back(childName);
-            result.push_back(path);
-            construstResult(child, path, result);
-            path.pop_back();
-        }
-    }
-
-    vector<vector<string>> deleteDuplicateFolder(vector<vector<string>>& paths) {
-        Node* root = getNode("/");
-
-        //Construct trie
-        for(auto& path : paths) {
-            insert(root, path);
-        }
-
-        unordered_map<string, int> subFolderMap;
-        populateNodes(root, subFolderMap);
-
-        removeDuplicates(root, subFolderMap);
-
-        vector<vector<string>> result;
-        vector<string> path;
-        construstResult(root, path, result);
-
-        return result;
-
-
-    }
+class node {
+    public:
+    string value; // Name
+    string subfolder; // Subfolder structure
+    unordered_map<string, node*> children; // Children nodes
 };
+
+node *getNode(string data){
+    node *newNode = new node();
+    newNode->value = data;
+    newNode->subfolder = "";
+
+    return newNode;
+}
+
+void insert(node *root, vector<string> &path){
+    for(auto &folder : path){
+        if(!root->children.count(folder)){ // If the folder does not exist, create a new node
+            root->children[folder] = getNode(folder); // Create a new node for the folder
+        }
+        root = root->children[folder]; // Move to the child node
+    }
+}
+
+string populateNodes(node *root, unordered_map<string, int> &subfolderCountMap){
+    vector<pair<string, string>> subfoldersPaths; // To store subfolder paths structure and its count
+
+    if(!root) return "";
+
+    for(auto it = root->children.begin(); it != root->children.end(); ++it){
+        string subFolderResult = populateNodes(it->second, subfolderCountMap);
+        subfoldersPaths.push_back({it->first, subFolderResult});
+    }
+    sort(subfoldersPaths.begin(), subfoldersPaths.end()); // Sort the subfolders to ensure consistent structure
+
+    string completePath = ""; // Construct the complete subfolder structure
+    for(auto it = subfoldersPaths.begin(); it != subfoldersPaths.end(); ++it){
+        completePath += "(" + it->first + it->second + ")"; // Append the child name and its subfolder structure
+    }
+
+    root->subfolder = completePath; // Set the subfolder structure for the current node
+    
+    if(!completePath.empty()){
+        subfolderCountMap[completePath]++; // Increment the count of this subfolder structure
+    }
+
+    return completePath; // Return the complete subfolder structure
+}
+
+void removeDuplicates(node *root, unordered_map<string, int> &subfolderCountMap){
+    if(!root) return;
+
+    for(auto itr = root->children.begin(); itr != root->children.end();){
+        string childName = itr->first;
+        node *childNode = itr->second;
+
+        if(!childNode->subfolder.empty() && subfolderCountMap[childNode->subfolder] > 1){
+            // If the subfolder structure is marked for deletion, remove this child
+            itr = root->children.erase(itr); // Erase the child node
+        } else {
+            removeDuplicates(childNode, subfolderCountMap); // Recursion for children
+            ++itr; // Move to the next child
+        }
+    }
+}
+
+void constructResult(node *root, vector<string> &path, vector<vector<string>> &ans){
+    if(!root) return;
+
+    for(auto it = root->children.begin(); it != root->children.end(); ++it){
+        path.push_back(it->first);
+        ans.push_back(path); // Add the current path to the result
+        constructResult(it->second, path, ans);
+        path.pop_back(); // Backtrack to the previous path
+    }
+}
+
+vector<vector<string>> deleteDuplicateFolder(vector<vector<string>>& paths){
+    node *root = getNode("/");
+
+    // Step 1: Construct the trie
+    for(auto &path : paths){
+        insert(root, path);
+    }
+
+    // Step 2: Populate the subfolder structure
+    unordered_map<string, int> subfolderCountMap;
+    populateNodes(root, subfolderCountMap);
+
+    // Step 3: Remove duplicate folders
+    removeDuplicates(root, subfolderCountMap);
+
+    // Step 4: Collect remaining folders
+    vector<vector<string>> ans;
+    vector<string> path;
+    constructResult(root, path, ans);
+
+    return ans;
+}
+
+int main() {
+    vector<vector<string>> paths = {{"a"}, {"c"}, {"d"}, {"a", "b"}, {"c", "b"}, {"d", "a"}};
+    vector<vector<string>> result = deleteDuplicateFolder(paths);
+
+    // Output the result in the requested format
+    cout << "[";
+    for (int i = 0; i < result.size(); i++) {
+        cout << "[";
+        for (int j = 0; j < result[i].size(); j++) {
+            cout << "\"" << result[i][j] << "\"";
+            if (j < result[i].size() - 1) cout << ",";
+        }
+        cout << "]";
+        if (i < result.size() - 1) cout << ",";
+    }
+    cout << "]" << endl;
+
+    return 0;
+}
