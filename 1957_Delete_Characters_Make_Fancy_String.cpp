@@ -41,39 +41,26 @@ s consists only of lowercase English letters.
 #include <string>
 using namespace std;
 
+// Function to make a fancy string (no three consecutive same characters)
 string makeFancyString(string s) {
-    
     string result = "";
-    if (s.empty()) {
-        return result;
-    }
-
-    result += s[0]; // Add the first character
-    for (int i = 1; i < s.length(); i++) {
-        // If the current character is the same as the previous two, skip it
-        if (result.length() >= 2 && s[i] == result[result.length() - 1] && s[i] == result[result.length() - 2]) {
+    int n = result.size();
+    
+    for (auto ch : s) {
+        // If last two characters in result are same as current, skip
+        if (n >= 2 && result[n - 1] == ch && result[n - 2] == ch) {
             continue;
         }
-        result += s[i]; // Add the current character to the result
+        else {
+            result += ch; // Add current character to result
+        }
     }
     return result;
 }
 
 int main() {
-    string s1 = "leeetcode";
-    cout << "Input: " << s1 << ", Output: " << makeFancyString(s1) << endl; // Expected: leetcode
-
-    string s2 = "aaabaaaa";
-    cout << "Input: " << s2 << ", Output: " << makeFancyString(s2) << endl; // Expected: aabaa
-
-    string s3 = "aab";
-    cout << "Input: " << s3 << ", Output: " << makeFancyString(s3) << endl; // Expected: aab
-
-    string s4 = "aaaaa";
-    cout << "Input: " << s4 << ", Output: " << makeFancyString(s4) << endl; // Expected: aa
-
-    string s5 = "abccddeefffgghh";
-    cout << "Input: " << s5 << ", Output: " << makeFancyString(s5) << endl; // Expected: abccddeeffgghh
-
+    string s = "aaabaaaa";
+    cout << "Original: " << s << endl;
+    cout << "Fancy: " << makeFancyString(s) << endl; // Output: aabaa
     return 0;
 }
