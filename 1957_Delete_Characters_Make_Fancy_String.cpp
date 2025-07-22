@@ -44,23 +44,19 @@ using namespace std;
 // Function to make a fancy string (no three consecutive same characters)
 string makeFancyString(string s) {
     string result = "";
-    int n = result.size();
-    
     for (auto ch : s) {
-        // If last two characters in result are same as current, skip
-        if (n >= 2 && result[n - 1] == ch && result[n - 2] == ch) {
+        // Use result.size() directly to check last two characters
+        if (result.size() >= 2 && result[result.size() - 1] == ch && result[result.size() - 2] == ch) {
             continue;
         }
-        else {
-            result += ch; // Add current character to result
-        }
+        result += ch;
     }
     return result;
 }
 
 int main() {
-    string s = "aaabaaaa";
+    string s = "leeetcode";
     cout << "Original: " << s << endl;
-    cout << "Fancy: " << makeFancyString(s) << endl; // Output: aabaa
+    cout << "Fancy: " << makeFancyString(s) << endl; // Output: leetcode
     return 0;
 }
