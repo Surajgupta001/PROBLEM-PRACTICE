@@ -56,138 +56,127 @@ Constraints:
 #include <algorithm>
 using namespace std;
 
-#include <iostream>
-#include <vector>
-using namespace std;
+// =================== Memoization ========================
+// Can only move diagonally
+int child1Collect(vector<vector<int>> &fruits, vector<vector<int>> &dp){
+    int n = fruits.size();
+    int ans = 0;
+    for(int i = 0; i < n; i++){
+        ans += fruits[i][i];
+        fruits[i][i] = 0;
+        dp[i][i] = 0;
+    }
+    return ans;
+}
 
-class Solution {
-    int n;
-    vector<vector<int>> t;
+int child2Collect(int i, int j, vector<vector<int>> &fruits, vector<vector<int>> &dp){
+    int n = fruits.size();
 
-public:
+    if(i < 0 || i >= n || j < 0 || j >= n) return 0;
 
-    //Can only move diagonally
-    int child1Collect(vector<vector<int>>& grid) {
-        int ans = 0;
-        for (int i = 0; i < n; i++) {
-            ans += grid[i][i];
-            grid[i][i] = 0;
-            t[i][i] = 0;
-        }
-        return ans;
+    if(i == n - 1 && j == n - 1) return 0;
+
+    // can't go beyond diagonal or left to diagonal (only have n-1 moves)
+    if(i == j || i > j) return 0;
+
+    if(dp[i][j] != -1) return dp[i][j];
+
+    int leftcorner = fruits[i][j] + child2Collect(i + 1, j - 1, fruits, dp);
+    int middle = fruits[i][j] + child2Collect(i + 1, j, fruits, dp);
+    int rightcorner = fruits[i][j] + child2Collect(i + 1, j + 1, fruits, dp);
+
+    return dp[i][j] = max({middle, rightcorner, leftcorner});
+}
+
+int child3Collect(int i, int j, vector<vector<int>> &fruits, vector<vector<int>> &dp){
+    int n = fruits.size();
+
+    if(i < 0 || i >= n || j < 0 || j >= n) return 0;
+    if(i == n - 1 && j == n - 1) return 0;
+
+    // can't go beyond diagonal or right to diagonal (only have n-1 moves)
+    if(i == j || j > i) return 0;
+
+    if(dp[i][j] != -1) return dp[i][j];
+
+    int topcorner = fruits[i][j] + child3Collect(i - 1, j + 1, fruits, dp);
+    int right = fruits[i][j] + child3Collect(i, j + 1, fruits, dp);
+    int rightcorner = fruits[i][j] + child3Collect(i + 1, j + 1, fruits, dp);
+
+    return dp[i][j] = max({right, rightcorner, topcorner});
+}
+
+int maxCollectedFruits(vector<vector<int>> &fruits){
+    int n = fruits.size();
+    vector<vector<int>> dp(n, vector<int>(n, -1));
+
+    // First child
+    int firstChildScore = child1Collect(fruits, dp);
+
+    // Second child
+    int secondChildScore = child2Collect(0, n - 1, fruits, dp);
+
+    // Third child
+    int thirdChildScore = child3Collect(n - 1, 0, fruits, dp);
+
+    return (firstChildScore + secondChildScore + thirdChildScore);
+}
+
+// =================== Tabulation ========================
+int maxCollectedFruits(vector<vector<int>> &fruits){
+    int n = fruits.size();
+    vector<vector<int>> dp(n, vector<int>(n, 0));
+    // dp[i][j] = max fruits collected till [i][j] from source
+
+    // child1Collect - Diagonal elements
+    int result = 0;
+    for(int i = 0; i < n; i++){
+        result += fruits[i][i];
     }
 
-    int child2Collect(int i, int j, vector<vector<int>>& grid) {
-        if (i < 0 || i >= n || j < 0 || j >= n) {
-            return 0;
-        }
-        if (i == n - 1 && j == n - 1) {
-            return 0;
-        }
-        
-        //can't go beyond diagonal or left to diagonal (only have n-1 moves)
-        if (i == j || i > j) {
-            return 0;
-        }
-
-        if (t[i][j] != -1)
-            return t[i][j];
-
-        int leftcorner = grid[i][j] + child2Collect(i + 1, j - 1, grid);
-        int middle = grid[i][j] + child2Collect(i + 1, j, grid);
-        int rightcorner = grid[i][j] + child2Collect(i + 1, j + 1, grid);
-
-        return t[i][j] = max({middle, rightcorner, leftcorner});
-    }
-
-    int child3Collect(int i, int j, vector<vector<int>>& grid) {
-        if (i < 0 || i >= n || j < 0 || j >= n) {
-            return 0;
-        }
-        if (i == n - 1 && j == n - 1) {
-            return 0;
-        }
-
-        //can't go beyond diagonal or right to diagonal (only have n-1 moves)
-        if (i == j || j > i) {
-            return 0;
-        }
-        if (t[i][j] != -1)
-            return t[i][j];
-
-        int topcorner   = grid[i][j] + child3Collect(i - 1, j + 1, grid);
-        int right       = grid[i][j] + child3Collect(i, j + 1, grid);
-        int rightcorner = grid[i][j] + child3Collect(i + 1, j + 1, grid);
-
-        return t[i][j] = max({right, rightcorner, topcorner});
-    }
-
-    int maxCollectedFruits(vector<vector<int>>& grid) {
-        n = grid.size();
-        t.resize(n, vector<int>(n, -1));
-
-        // First child
-        int firstChildScore = child1Collect(grid);
-
-        // Second child
-        int secondChildScore = child2Collect(0, n - 1, grid);
-
-        // Third child
-        int thirdChildScore  = child3Collect(n - 1, 0, grid);
-
-        return (firstChildScore + secondChildScore + thirdChildScore);
-    }    
-};
-
-
-//Approach-2 - (Bottom Up)
-//T.C : O(n^2)
-//S.C : O(n^2)
-class Solution {
-public:
-    int maxCollectedFruits(vector<vector<int>>& fruits) {
-        int n = fruits.size();
-        vector<vector<int>> t(n, vector<int>(n, 0));
-        //t[i][j] = max fruits collected till [i][j]
-
-        //child1Collect - Diagonal elements
-        int result = 0;
-        for(int i = 0; i < n; i++) {
-            result += fruits[i][i];
-        }
-
-
-        //Before child2 and child3, nullify the cells which can't be visited by child2 and child3
-        for(int i = 0; i < n; i++) {
-            for(int j = 0; j < n; j++) {
-                if(i < j && i+j < n-1) {
-                    t[i][j] = 0;
-                } else if(i > j && i+j < n-1) {
-                    t[i][j] = 0;
-                } else {
-                    t[i][j] = fruits[i][j];
-                }
+    // Before child2 and child3, nullify the cells which can'dp be visited by child2 and child3
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < n; j++){
+            if(i < j && i + j < n - 1){
+                dp[i][j] = 0;
+            }
+            else if (i > j && i + j < n - 1){
+                dp[i][j] = 0;
+            }
+            else{
+                dp[i][j] = fruits[i][j];
             }
         }
-
-
-        //child2 collect fruits
-        //cells upper to diagonal : i < j
-        for(int i = 1; i < n; i++) {
-            for(int j = i+1; j < n; j++) {
-                t[i][j] += max({t[i-1][j-1], t[i-1][j], (j+1 < n) ? t[i-1][j+1] : 0});
-            }
-        }
-
-        //child3 collect fruits
-        //cells upper to diagonal : i > j
-        for(int j = 1; j < n; j++) {
-            for(int i = j+1; i < n; i++) {
-                t[i][j] += max({t[i-1][j-1], t[i][j-1], (i+1 < n) ? t[i+1][j-1] : 0});
-            }
-        }
-
-        return result + t[n-2][n-1] + t[n-1][n-2];
-
     }
-};
+
+    // child2 collect fruits
+    // cells upper to diagonal : i < j
+    for(int i = 1; i < n; i++){
+        for(int j = i + 1; j < n; j++){
+            dp[i][j] += max({dp[i - 1][j - 1], dp[i - 1][j], (j + 1 < n) ? dp[i - 1][j + 1] : 0});
+        }
+    }
+
+    // child3 collect fruits
+    // cells upper to diagonal : i > j
+    for(int j = 1; j < n; j++){
+        for(int i = j + 1; i < n; i++){
+            dp[i][j] += max({dp[i - 1][j - 1], dp[i][j - 1], (i + 1 < n) ? dp[i + 1][j - 1] : 0});
+        }
+    }
+
+    return result + dp[n-2][n-1] + dp[n-1][n-2];
+}
+
+int main(){
+    vector<vector<int>> fruits = {
+        {1, 2, 3, 4},
+        {5, 6, 8, 7},
+        {9, 10, 11, 12},
+        {13, 14, 15, 16}};
+
+    int result = maxCollectedFruits(fruits);
+    cout << "Maximum fruits collected: " << result << endl;
+
+    return 0;
+}
