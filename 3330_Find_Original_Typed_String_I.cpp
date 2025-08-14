@@ -46,17 +46,20 @@ word consists only of lowercase English letters.
 */ 
 
 #include <iostream>
-#include <string>
 using namespace std;
 
+int possibleStringCount(string word) {
+    int count = 0;
 
-    int possibleStringCount(string word) {
-        int count = 0;
-
-        for (int i = 1; i < word.length(); i++) {
-            if (word[i] == word[i - 1])
-                count++;
-        }
-
-        return count + 1; //+1 for when Alice does no long press
+    for (int i = 1; i < word.length(); i++) {
+        if (word[i] == word[i - 1]) count++;
     }
+
+    return count + 1; //+1 for when Alice does no long press
+}
+
+int main() {
+    string word = "abbcccc";
+    cout << possibleStringCount(word) << endl;  // Output: 5
+    return 0;
+}
