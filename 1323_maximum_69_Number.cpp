@@ -33,8 +33,8 @@ Explanation: It is better not to apply any change.
 using namespace std;
 
 int maximum69Number(int num) {
-    int i = 0;
-    int j = -1;
+    int i = 0; // Position of the last digit
+    int j = -1; // Position of the last '6'
 
     // Store the original number
     int originalNum = num;
