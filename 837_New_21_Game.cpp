@@ -40,24 +40,24 @@ Constraints:
 #include <numeric>
 using namespace std;
 
-// double new21Game(int n, int k, int maxPts){
-//     vector<double> prob(n + 1, 0.0);
-//     // prob[i] = probability of getting score = i
-//     prob[0] = 1.0;
+double new21Game(int n, int k, int maxPts){
+    vector<double> prob(n + 1, 0.0);
+    // prob[i] = probability of getting score = i
+    prob[0] = 1.0;
 
-//     for (int i = 1; i <= n; i++){
-//         for (int card = 1; card <= maxPts; card++){
-//             if (i - card >= 0 && i - card < k){
-//                 // probability of score card = 1/maxPts
-//                 // Remaining score = p[i-card]
-//                 prob[i] += prob[i - card] / maxPts;
-//             }
-//         }
-//     }
+    for (int i = 1; i <= n; i++){
+        for (int card = 1; card <= maxPts; card++){
+            if (i - card >= 0 && i - card < k){
+                // probability of score card = 1/maxPts
+                // Remaining score = p[i-card]
+                prob[i] += prob[i - card] / maxPts;
+            }
+        }
+    }
 
-//     // Sum probabilities for final scores in [k, n]
-//     return accumulate(prob.begin() + k, prob.begin() + n + 1, 0.0);
-// }
+    // Sum probabilities for final scores in [k, n]
+    return accumulate(prob.begin() + k, prob.begin() + n + 1, 0.0);
+}
 
 // Optimised code - Dynamic Programming
 double new21Game(int n, int k, int maxPts){
