@@ -41,6 +41,11 @@ Constraints:
 0 <= arr[i][j] <= 1
 */ 
 
+/*
+============ IMPORTANT POINTS =================
+A square submatrix means a contiguous block of cells forming a square (e.g., 1x1, 2x2, 3x3, etc.), and all its elements must be 1.
+*/ 
+
 #include <iostream>
 #include <algorithm>
 #include <vector>
