@@ -58,29 +58,34 @@ word consists of English uppercase and lowercase letters, digits, '@', '#', and 
 #include <string>
 using namespace std;
 
-class Solution {
-public:
-    bool isValid(string word) {
-        if(word.length() < 3) {
+bool isValid(string word) {
+    if(word.length() < 3) {
+        return false;
+    }
+
+    bool hasVowel = false;
+    bool hasConsonant = false;
+
+    for(char ch : word) {
+        if(isalpha(ch)) {
+            ch = tolower(ch);
+            if(ch == 'a' || ch == 'e' || ch == 'i' || ch == 'o' || ch == 'u') {
+                hasVowel = true;
+            } else {
+                hasConsonant = true;
+            }
+        } else if(!isdigit(ch)) {
             return false;
         }
-
-        bool hasVowel     = false;
-        bool hasConsonant = false;
-
-        for(char ch : word) {
-            if(isalpha(ch)) {
-                ch = tolower(ch);
-                if(ch == 'a' || ch == 'e' || ch == 'i' || ch == 'o' || ch == 'u') {
-                    hasVowel = true;
-                } else {
-                    hasConsonant = true;
-                }
-            } else if(!isdigit(ch)) {
-                return false;
-            }
-        }
-
-        return hasVowel && hasConsonant;
     }
-};
+
+    return hasVowel && hasConsonant;
+}
+
+int main() {
+    cout << isValid("234Adas") << endl;  // true
+    cout << isValid("b3") << endl;        // false
+    cout << isValid("a3$e") << endl;     // false
+
+    return 0;
+}
