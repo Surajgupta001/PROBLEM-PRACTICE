@@ -93,14 +93,14 @@ int countSquares(vector<vector<int>>& matrix) {
     // dp[i][j] = total square submatrix with all ones ending at (i,j)
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < m; j++) {
-            if (matrix[i][j] == 1) {
-                dp[i][j] = 1;
-                if (i > 0 && j > 0) {
-                    int top = dp[i - 1][j];
-                    int left = dp[i][j - 1];
-                    int upper = dp[i - 1][j - 1];
-                    dp[i][j] += min({top, left, upper});
-                }
+            if (i == 0 or j == 0) { // 0th row or 0th column
+                dp[i][j] = matrix[i][j];
+            } 
+            else if (matrix[i][j] == 1) {
+                int top = dp[i - 1][j];
+                int left = dp[i][j - 1];
+                int upper = dp[i - 1][j - 1];
+                dp[i][j] = 1 + min({top, left, upper});
             }
             count += dp[i][j];
         }
