@@ -51,6 +51,37 @@ A square submatrix means a contiguous block of cells forming a square (e.g., 1x1
 #include <vector>
 using namespace std;
 
+int helper(int i, int j, const vector<vector<int>>& matrix, vector<vector<int>>& dp) {
+    int n = matrix.size();
+    int m = matrix[0].size();
+    if (i >= n || j >= m) return 0; // out of bounds
+
+    if (dp[i][j] != -1) return dp[i][j]; // cached
+
+    if (matrix[i][j] == 0) return dp[i][j] = 0; // no square starts here
+
+    int right = helper(i, j + 1, matrix, dp);
+    int diagonal = helper(i + 1, j + 1, matrix, dp);
+    int below = helper(i + 1, j, matrix, dp);
+
+    return dp[i][j] = 1 + min({right, diagonal, below});
+}
+
+int countSquares(vector<vector<int>>& matrix) {
+    int n = matrix.size();
+    int m = matrix[0].size();
+    vector<vector<int>> dp(n, vector<int>(m, -1));
+    
+    int count = 0;
+    for(int i=0; i<n; i++){
+        for(int j=0; j<m; j++){
+            count += helper(i, j, matrix, dp);
+        }
+    }
+    return count;
+}
+
+// ============= Tabulation =================
 int countSquares(vector<vector<int>>& matrix) {
     int n = matrix.size();
     int m = matrix[0].size();
@@ -58,17 +89,20 @@ int countSquares(vector<vector<int>>& matrix) {
 
     // For each cell (i, j) in the matrix, calculate the size of the largest square submatrix with all ones that ends at (i, j).
 
-    for(int i=0; i<n; i++){
-        for(int j=0; j<m; j++){
-            if(matrix[i][j] == 1 && i > 0 && j > 0){
-                // This value represents the largest square ending at (i,j)
-                int top = matrix[i-1][j];
-                int left = matrix[i][j-1];
-                int top_left = matrix[i-1][j-1];
-                
-                matrix[i][j] = min({top, left, top_left}) + 1;
+    vector<vector<int>> dp(n, vector<int>(m, 0));
+    // dp[i][j] = total square submatrix with all ones ending at (i,j)
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            if (matrix[i][j] == 1) {
+                dp[i][j] = 1;
+                if (i > 0 && j > 0) {
+                    int top = dp[i - 1][j];
+                    int left = dp[i][j - 1];
+                    int upper = dp[i - 1][j - 1];
+                    dp[i][j] += min({top, left, upper});
+                }
             }
-            count += matrix[i][j];
+            count += dp[i][j];
         }
     }
     return count;
