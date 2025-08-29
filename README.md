@@ -51,6 +51,14 @@ Contributions are welcome! If you have a solution to a new problem or an improve
 3. Add comments to explain your approach
 4. Create a pull request
 
+## 📦 Releases
+
+This repository follows [Semantic Versioning](https://semver.org/). Check the [Releases](https://github.com/Surajgupta001/PROBLEM-PRACTICE/releases) page for version history and download links.
+
+**Current Version**: v1.0.0
+
+For detailed changes, see [CHANGELOG.md](CHANGELOG.md).
+
 ## 📄 License
 
 This repository is open-source and available under the [MIT License](https://opensource.org/licenses/MIT).
