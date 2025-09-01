@@ -51,23 +51,68 @@ board[i][j] is a digit 1-9 or '.'.
 #include <unordered_set>
 using namespace std;
 
-bool isValidSudoku(vector<vector<char>>& board) {
-    unordered_set<string> st;
-    
-    for(int i = 0; i<9; i++) {
-        for(int j = 0; j<9; j++) {
-            if(board[i][j] == '.') continue;
-            
-            string row = string(1, board[i][j]) + "_row_" + to_string(i);
-            string col = string(1, board[i][j]) + "_col_" + to_string(j);
-            string box = string(1, board[i][j]) + "_box_" + to_string(i/3) + "_" + to_string(j/3);
-            if(st.count(row) || st.count(col) || st.count(box)) return false;
-            st.insert(row);
-            st.insert(col);
-            st.insert(box);
+bool isValidSubBox(vector<vector<char>>& board, int startRow, int endRow, int startCol, int endCol) {
+    unordered_set<char> set;
+    for (int i = startRow; i <= endRow; i++) {
+        for (int j = startCol; j <= endCol; j++) {
+            char curr = board[i][j];
+            if (curr != '.' && set.count(curr)) return false;
+            set.insert(curr);
         }
     }
-    
+    return true;
+}
+
+// Approach 1: Brute Force
+bool isValidSudoku(vector<vector<char>>& board) {
+    // Step 1: Validate Rows
+    for(int row=0; row<9; row++){
+        unordered_set<char> set;
+        for(int col=0; col<9; col++){
+            if(board[row][col] == '.') continue;
+            if(set.count(board[row][col])) return false;
+            set.insert(board[row][col]);
+        }
+    }
+
+    // Step 2: Validate Columns
+    for(int col=0; col<9; col++){
+        unordered_set<char> set;
+        for(int row=0; row<9; row++){
+            if(board[row][col] == '.') continue;
+            if(set.count(board[row][col])) return false;
+            set.insert(board[row][col]);
+        }
+    }
+
+    // Step 3: Validate 3x3 Sub-boxes
+    for(int startRow = 0; startRow<9; startRow+=3){
+        int endRow = startRow + 2;
+        for(int startCol = 0; startCol<9; startCol+=3){
+            int endCol = startCol + 2;
+            // startRow, EndRow, StartCol, EndCol
+            if(!isValidSubBox(board, startRow, endRow, startCol, endCol)) return false;
+        }
+    }
+
+    return true;
+}
+
+// Approach 2: Optimized
+bool isValidSudoku(vector<vector<char>>& board) {
+    unordered_set<string> set;
+    for(int i=0; i<9; i++){
+        for(int j=0; j<9; j++){
+            if(board[i][j] == '.') continue;
+            string row = string(1, board[i][j]) + "_row" + to_string(i);
+            string col = string(1, board[i][j]) + "_col" + to_string(j);
+            string box = string(1, board[i][j]) + "_box" + to_string(i/3) + to_string(j/3);
+            if(set.count(row) || set.count(col) || set.count(box)) return false;
+            set.insert(row);
+            set.insert(col);
+            set.insert(box);
+        }
+    }
     return true;
 }
 
@@ -84,11 +129,7 @@ int main() {
         {'.', '.', '.', '.', '8', '.', '.', '7', '9'}
     };
 
-    if (isValidSudoku(board)) {
-        cout << "Valid Sudoku" << endl;
-    } else {
-        cout << "Invalid Sudoku" << endl;
-    }
+    cout << boolalpha << isValidSudoku(board) << endl;
 
     return 0;
 }
