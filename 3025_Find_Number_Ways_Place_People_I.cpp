@@ -57,43 +57,92 @@ All points[i] are distinct.
 #include <algorithm>
 using namespace std;
 
+// Approach - 1: Brute Force
 int numberOfPairs(vector<vector<int>>& points) {
     int n = points.size();
-    // Sort: x ascending, if x same then sort as y descending
-    auto lambda = [](vector<int>& point1, vector<int>& point2) {
-        if (point1[0] == point2[0]) {
-            return point1[1] > point2[1];
-        }
-        return point1[0] < point2[0];
-    };
-    sort(points.begin(), points.end(), lambda);
-    int result = 0;
+    int count = 0;
+    
     for (int i = 0; i < n; i++) {
+        // A - Upper Wala points hai
         int x1 = points[i][0];
-        int y1 = points[i][1];   // upper left
-        int bestY = INT_MIN;
-        for (int j = i + 1; j < n; j++) {
+        int y1 = points[i][1];
+        
+        // B - Lower Wala points hai
+        for (int j = 0; j < n; j++) {
+            if (i == j) continue;
+        
             int x2 = points[j][0];
-            int y2 = points[j][1];   // lower right
-            // Condition: (x2, y2) must be above (x1, y1)
-            if (y2 > y1) { //not lower right
-                continue;
-            }
-            if (y2 > bestY) {
-                result++;
-                bestY = y2;
+            int y2 = points[j][1];
+        
+            if (x1 <= x2 and y1 >= y2) {
+                bool hasPointInside = false;
+                for (int k = 0; k < n; k++) {
+                    if (k == i or k == j) continue;
+        
+                    int x3 = points[k][0];
+                    int y3 = points[k][1];
+        
+                    if (x3 >= x1 and x3 <= x2 and y3 <= y1 and y3 >= y2) {
+                        hasPointInside = true;
+                        break;
+                    }
+                }
+        
+                if (!hasPointInside) count++;
             }
         }
     }
-    return result;
+    return count;
+}
+
+// Sort: x ascending, if x same then sort as y descending
+bool customComparator(vector<int>& point1, vector<int>& point2) {
+    if (point1[0] == point2[0]) {
+        return point1[1] < point2[1];
+    }
+    return point1[0] < point2[0];
+}
+
+// Approach - 2: Slightly Improved
+int numberOfPairs(vector<vector<int>>& points) {
+    int n = points.size();
+    int count = 0;
+
+    // Sort points using the custom comparator
+    sort(points.begin(), points.end(), customComparator);
+
+    for (int i = 0; i < n; i++) {
+        // A - Upper point
+        int x1 = points[i][0];
+        int y1 = points[i][1];
+
+        int maxY = INT_MIN;
+        // B - Find lower right points
+        for (int j = i + 1; j < n; j++) {
+            int x2 = points[j][0];
+            int y2 = points[j][1];
+
+            if (y2 > y1) continue; // Skip if point B is above A
+
+            if (y2 >= maxY) {
+                count++;
+                maxY = y2;
+            }
+        }
+    }
+    return count;
 }
 
 int main() {
+    
     vector<vector<int>> points = {{1,1},{2,2},{3,3}};
     cout << numberOfPairs(points) << endl;  // Output: 0
+    
     points = {{6,2},{4,4},{2,6}};
     cout << numberOfPairs(points) << endl;  // Output: 2
+    
     points = {{3,1},{1,3},{1,1}};
     cout << numberOfPairs(points) << endl;  // Output: 2
+    
     return 0;
 }
