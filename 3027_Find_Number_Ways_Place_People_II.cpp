@@ -98,6 +98,7 @@ int numberOfPairs(vector<vector<int>>& points) {
 }
 
 int main() {
+    
     vector<vector<int>> points = {{1, 1}, {2, 2}, {3, 3}};
     cout << numberOfPairs(points) << endl;  // Output: 0
 
