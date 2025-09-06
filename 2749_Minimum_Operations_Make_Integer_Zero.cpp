@@ -42,21 +42,21 @@ using namespace std;
 int makeTheIntegerZero(int num1, int num2) {
     int n = 1;
     while(true){
-        int value = num1 - n * num2;
+        long long value = (long long)num1 - (long long)n * num2;
         if(value < n) return -1;
-        if(__builtin_popcount(value) <= n && n <= value) {
+        if(__builtin_popcountll(value) <= n && n <= value) {
             return n;
         }
         n++;
     }
 }
 
-// Approach - 2: 
+// Approach - 2: Better Approach
 int makeTheIntegerZero(int num1, int num2){
     for(int n = 1; n <= 60; n++){
         long long value = (long long)num1 - (long long)n * num2;
         if(value < n) return -1;
-        if(__builtin_popcount(value) <= n && n <= value) {
+        if(__builtin_popcountll(value) <= n && n <= value) {
             return n;
         }
     }
