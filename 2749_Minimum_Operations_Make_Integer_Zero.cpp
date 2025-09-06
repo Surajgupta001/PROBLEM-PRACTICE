@@ -38,15 +38,35 @@ Constraints:
 #include <cmath>
 using namespace std;
 
+// Approach - 1: 
 int makeTheIntegerZero(int num1, int num2) {
-    for(int t = 1; t <= 36; t++) {
-        long long val = (long long)num1 - (long long)t * num2;
-        if(val < 0)
-            return -1;
-        
-        if(__builtin_popcountll(val) <= t && t <= val) {
-            return t;
+    int n = 1;
+    while(true){
+        int value = num1 - n * num2;
+        if(value < n) return -1;
+        if(__builtin_popcount(value) <= n && n <= value) {
+            return n;
+        }
+        n++;
+    }
+}
+
+// Approach - 2: 
+int makeTheIntegerZero(int num1, int num2){
+    for(int n = 1; n <= 60; n++){
+        long long value = (long long)num1 - (long long)n * num2;
+        if(value < n) return -1;
+        if(__builtin_popcount(value) <= n && n <= value) {
+            return n;
         }
     }
     return -1;
+}
+
+int main() {
+    int num1 = 3, num2 = -2;
+    int result = makeTheIntegerZero(num1, num2);
+    cout << "Minimum operations to make " << num1 << " equal to 0 with " << num2 << " is: " << result << endl;
+
+    return 0;
 }
