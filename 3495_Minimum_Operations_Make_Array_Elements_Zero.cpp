@@ -1,0 +1,115 @@
+/*
+Minimum Operations to Make Array Elements Zero - [Leetcode - 3495(HARD)]
+--------------------------------------------------------------------------
+You are given a 2D array queries, where queries[i] is of the form [l, r]. Each queries[i] defines an array of integers nums consisting of elements ranging from l to r, both inclusive.
+
+In one operation, you can:
+
+Select two integers a and b from the array.
+Replace them with floor(a / 4) and floor(b / 4).
+Your task is to determine the minimum number of operations required to reduce all elements of the array to zero for each query. Return the sum of the results for all queries.
+
+Example 1:
+
+Input: queries = [[1,2],[2,4]]
+
+Output: 3
+
+Explanation:
+
+For queries[0]:
+
+The initial array is nums = [1, 2].
+In the first operation, select nums[0] and nums[1]. The array becomes [0, 0].
+The minimum number of operations required is 1.
+For queries[1]:
+
+The initial array is nums = [2, 3, 4].
+In the first operation, select nums[0] and nums[2]. The array becomes [0, 3, 1].
+In the second operation, select nums[1] and nums[2]. The array becomes [0, 0, 0].
+The minimum number of operations required is 2.
+The output is 1 + 2 = 3.
+
+Example 2:
+
+Input: queries = [[2,6]]
+
+Output: 4
+
+Explanation:
+
+For queries[0]:
+
+The initial array is nums = [2, 3, 4, 5, 6].
+In the first operation, select nums[0] and nums[3]. The array becomes [0, 3, 4, 1, 6].
+In the second operation, select nums[2] and nums[4]. The array becomes [0, 3, 1, 1, 1].
+In the third operation, select nums[1] and nums[2]. The array becomes [0, 0, 0, 1, 1].
+In the fourth operation, select nums[3] and nums[4]. The array becomes [0, 0, 0, 0, 0].
+The minimum number of operations required is 4.
+The output is 4.
+
+Constraints:
+
+1 <= queries.length <= 105
+queries[i].length == 2
+queries[i] == [l, r]
+1 <= l < r <= 109
+ 
+*/ 
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+long long solve(int l, int r){
+    // check range L, R
+    // 1 to 3 : 1 steps
+    // 4 to 15 : 2 steps
+    // 16 to 63 : 3 steps
+    // 64 to 255 : 4 steps
+
+    long long L = 1; // & R = 4*L-1
+    long long S = 1; // steps
+    long long steps = 0; // Total steps
+
+    while(L <= r){
+        long long R = 4 * L - 1; // Right boundary of the current range
+
+        long long start = max(L, (long long)l); // Start of the current range
+        long long end = min(R, (long long)r); // End of the current range
+
+        if(start <= end){
+            steps += (end - start + 1) * S; // Total element = end-start+1
+        }
+
+        S++; // Going to next range
+        L *= 4; // Expanding the range
+    }
+    return steps;
+}
+
+long long minOperations(vector<vector<int>>& queries) {
+    long long result = 0;
+    
+    for(auto &query : queries){
+        int l = query[0];
+        int r = query[1];
+
+        long long steps = solve(l, r);
+
+        result += (steps + 1)/2;
+    }
+    return result;
+}
+
+int main() {
+
+    vector<vector<int>> queries = {{1, 2}, {2, 4}, {2, 6}};
+    
+    long long result = minOperations(queries);
+    
+    cout << result << endl; // Output the result
+    
+    return 0;
+}
