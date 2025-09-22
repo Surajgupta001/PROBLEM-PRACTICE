@@ -25,11 +25,13 @@ n == nums.length
 */ 
 
 #include <iostream>
+#include <algorithm>
+#include <unordered_map>
 #include <vector>
 using namespace std;
 
 // Using Majority Element Concept -> Boyer-Moore Majority Algorithms
-int majorityElement(vector<int>& nums) {
+int majorityElement(vector<int>& nums) {  // Optimal Approach - O(N) time and O(1) space
     int n = nums.size();
     int count = 0;
     int majority = NULL;
@@ -48,6 +50,32 @@ int majorityElement(vector<int>& nums) {
     }
     //Since it is gauranteed that majority element exists, so we don't check for freq of "majority" and return
     return majority;
+}
+
+// 2nd Approach - Using sorting
+int majorityElement(vector<int>& nums) { // Simple Approach - O(NlogN) time and O(1) space
+    sort(nums.begin(), nums.end());
+    return nums[nums.size()/2];
+}
+
+// 3rd Approach - using nth_element (partial sorting to median position)
+int majorityElement(vector<int>& nums) { // Simple Approach - O(N) average time and O(1) space
+    nth_element(nums.begin(), nums.begin() + nums.size()/2, nums.end());
+    return nums[nums.size()/2];
+}
+
+// 4th Approach - Using HashMap
+int majorityElement(vector<int>& nums) { // Simple Approach - O(N) time and O(N) space
+    unordered_map<int, int> freqMap;
+    int n = nums.size();
+    
+    for(int i = 0; i<n; i++){
+        freqMap[nums[i]]++;
+        if(freqMap[nums[i]] > n/2){
+            return nums[i];
+        }
+    }
+    return -1; // This line will never be reached as majority element is guaranteed to exist
 }
 
 int main(){
