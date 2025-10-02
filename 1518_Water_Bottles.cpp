@@ -28,6 +28,28 @@ Constraints:
 
 */
 
+/*
+============ Similar Problems Leetcode[1518] and Leetcode[3100] ============
+Key differences: 1518 vs 3100
+
+• Exchange cost:
+  => 1518: Constant (fixed numExchange throughout).
+  => 3100: Increases by 1 after each exchange.
+
+• Exchange frequency:
+  => 1518: You can effectively exchange as many times as empties allow at the same cost.
+  => 3100: Only one exchange per cost level; cost rises, so total extra bottles is smaller.
+
+• Edge case:
+  => 1518 disallows numExchange = 1 (min is 2), avoiding infinite loop.
+  => 3100 allows numExchange = 1 but prevents infinity because the cost bumps to 2 after the first exchange.
+
+• Solution style:
+  => 1518: Has a clean O(1) formula: numBottles + (numBottles − 1) / (numExchange − 1).
+  => 3100: No simple closed form due to increasing cost; use greedy simulation.
+
+*/
+
 #include <iostream>
 using namespace std;
 
