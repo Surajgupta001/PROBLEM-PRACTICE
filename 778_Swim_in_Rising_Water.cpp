@@ -42,24 +42,83 @@ Each value grid[i][j] is unique.
 #include <algorithm>
 using namespace std;
 
+vector<vector<int>> directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+
+// DFS to check if we can reach (n-1, n-1) from (0, 0) at given time
+bool possibleToReach(vector<vector<int>>& grid, int i, int j, int time, vector<vector<bool>>& visited){
+    int n = grid.size();
+
+    // Base Cases
+    if(i < 0 || i >= n || j < 0 || j >= n || grid[i][j] > time || visited[i][j] == true){
+        return false;
+    }
+
+    visited[i][j] = true; // Mark cell as visited
+    if(i == n - 1 && j == n - 1){ // Reached destination
+        return true;
+    }
+
+    for(auto& dir : directions){
+        int newX = i + dir[0]; // New row
+        int newY = j + dir[1]; // New column
+
+        if(possibleToReach(grid, newX, newY, time, visited)){ // Explore in all 4 directions
+            return true;
+        }
+    }
+
+    return false;
+}
+
+// Approach - 1: Binary Search On Answer
 int swimInWater(vector<vector<int>>& grid) {
     int n = grid.size();
-    vector<vector<bool>> visited(n, vector<bool>(n, false));
-    priority_queue<pair<int, pair<int, int>>, vector<pair<int, pair<int, int>>>, greater<pair<int, pair<int, int>>>> minHeap;
-    minHeap.push({grid[0][0], {0, 0}});
-    visited[0][0] = true;
-    int directions[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+
+    int low = grid[0][0]; // Minimum time to reach (0, 0)
+    int high = n * n - 1; // Maximum time to reach (n-1, n-1)
+
+    int result = 0;
+
+    while(low <= high){
+        int mid = low + (high - low) / 2; // Mid time to check if we can reach (n-1, n-1)
+
+        vector<vector<bool>> visited(n, vector<bool>(n, false)); // To keep track of visited cells
+        if(possibleToReach(grid, 0, 0, mid, visited)){
+            result = mid; // Update result if we can reach (n-1, n-1) at time mid
+            high = mid - 1; // Try to find a smaller time
+        }
+        else {
+            low = mid + 1; // Try to find a larger time
+        }
+    }
+    return result;
+}
+
+// Approach - 2: Dijkstra's Algorithm (Using Min-Heap)
+int swimInWater(vector<vector<int>>& grid) {
+    int n = grid.size();
+    vector<vector<bool>> visited(n, vector<bool>(n, false)); // To keep track of visited cells
+    
+    priority_queue<pair<int, pair<int, int>>, vector<pair<int, pair<int, int>>>, greater<pair<int, pair<int, int>>>> minHeap; // Min-Heap to store {elevation, {x, y}}
+    
+    minHeap.push({grid[0][0], {0, 0}}); // Start from (0, 0)
+    
+    visited[0][0] = true; // Mark (0, 0) as visited
+    
     int result = 0;
 
     while (!minHeap.empty()) {
-        auto current = minHeap.top();
-        minHeap.pop();
-        int elevation = current.first;
-        int x = current.second.first;
-        int y = current.second.second;
-        result = max(result, elevation);
+        auto current = minHeap.top(); // Get the cell with the minimum elevation
+        minHeap.pop(); // Remove the cell from the heap
+        
+        int elevation = current.first; // Current elevation
+        
+        int x = current.second.first; // Current row
+        int y = current.second.second; // Current column
+        
+        result = max(result, elevation); // Update result with the maximum elevation encountered so far
 
-        if (x == n - 1 && y == n - 1) {
+        if (x == n - 1 && y == n - 1) { // Reached destination
             return result;
         }
 
@@ -67,9 +126,10 @@ int swimInWater(vector<vector<int>>& grid) {
             int newX = x + dir[0];
             int newY = y + dir[1];
 
+            // Check if the new cell is within bounds and not visited
             if (newX >= 0 && newX < n && newY >= 0 && newY < n && !visited[newX][newY]) {
-                visited[newX][newY] = true;
-                minHeap.push({grid[newX][newY], {newX, newY}});
+                visited[newX][newY] = true; // Mark new cell as visited
+                minHeap.push({grid[newX][newY], {newX, newY}}); // Push new cell into the heap
             }
         }
     }
