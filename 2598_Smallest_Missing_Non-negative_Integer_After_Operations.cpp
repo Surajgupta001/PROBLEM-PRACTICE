@@ -37,21 +37,31 @@ Constraints:
 -109 <= nums[i] <= 109
 */ 
 
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
+#include <unordered_map>
 using namespace std;
 
+/*
+====== Story Point ======
+1. Find % of all numbers -> store in a map with count
+2. start MEX = 0
+3. If map doesn't contain (MEX % value) -> MEX ; else reduce count and MEX++
+*/
 
 int findSmallestInteger(vector<int>& nums, int value) {
-    unordered_map<int, int> mp;
-    for(int &num : nums) {
-        int r = ((num % value) + value) % value;
-        mp[r]++;
+    unordered_map<int, int> map; // to store count of each remainder
+    for(auto &num : nums){
+        int remainder = ((num % value) + value) % value; // handle negative numbers
+        map[remainder]++; // count of each remainder
     }
+
     int MEX = 0;
-    while(mp[(MEX % value)] > 0) {
-        mp[(MEX % value)]--;
+    while(map[(MEX % value)] > 0){
+        map[(MEX % value)]--;
         MEX++;
     }
+    
     return MEX;
 }
 
