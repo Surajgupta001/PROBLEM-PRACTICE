@@ -47,18 +47,21 @@ using namespace std;
 
 int maxDistinctElements(vector<int>& nums, int k) {
     int n = nums.size();
-    sort(begin(nums), end(nums));
+    sort(nums.begin(), nums.end());
+    
     int count = 0;
     int prev = INT_MIN;
-    for(int i = 0; i < n; i++) {
-        int minVal = nums[i] - k;
-        if(prev < minVal) {
-            //nums[i] = nums[i]-k;
-            prev = minVal;
+
+    for(int i=0; i<n; i++){
+        int minValue = nums[i] - k;
+        if(prev < minValue) {
+            // nums[i] = nums[i] - k;
+            prev = minValue;
             count++;
-        } else if(prev < nums[i] + k) {
-            //nums[i] = prev+1;
-            prev = prev+1;
+        }
+        else if(prev < nums[i] + k) {
+            // nums[i] = prev + 1;
+            prev = prev + 1;
             count++;
         }
     }
