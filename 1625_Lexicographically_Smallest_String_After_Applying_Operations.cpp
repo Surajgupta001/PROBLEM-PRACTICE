@@ -57,30 +57,46 @@ s consists of digits from 0 to 9 only.
 #include <iostream>
 #include <string>
 #include <unordered_set>
+#include <queue>
 #include <algorithm>
 using namespace std;
 
-
-void rotate(string &s, int b) {
-    reverse(begin(s), end(s));
-    reverse(begin(s), begin(s) + b);
-    reverse(begin(s) + b, end(s));
-}
-void dfs(string curr, int a, int b, unordered_set<string> &visited, string &smallestString) {
-    if (visited.count(curr)) return;
-    visited.insert(curr);
-    if (curr < smallestString) smallestString = curr;
-    string added = curr;
-    for (int i = 1; i < added.size(); i += 2)
-        added[i] = ((added[i] - '0' + a) % 10) + '0';
-    dfs(added, a, b, visited, smallestString);
-    rotate(curr, b);
-    dfs(curr, a, b, visited, smallestString);
-}
 string findLexSmallestString(string s, int a, int b) {
-    unordered_set<string> visited;
     string smallestString = s;
-    dfs(s, a, b, visited, smallestString);
+
+    queue<string> qu; // BFS queue
+    unordered_set<string> visited; // To keep track of visited strings
+
+    qu.push(s); // Start BFS with the initial string
+    visited.insert(s); // Mark the initial string as visited
+
+    while(not qu.empty()){
+        string curr = qu.front();
+        qu.pop();
+
+        if(curr < smallestString){
+            smallestString = curr; // Update smallest string if current is smaller
+        }
+
+        // ADD a to all odd indices
+        string temp = curr;
+        for(int i=1; i<curr.size(); i+=2){
+            temp[i] = ((temp[i] - '0' + a) % 10) + '0'; // Add a and wrap around using modulo 10
+        }
+
+        if(not visited.count(temp)){
+            visited.insert(temp);
+            qu.push(temp);
+        }
+
+        // ROTATE the string by b positions
+        rotate(curr.rbegin(), curr.rbegin() + b, curr.rend());
+        if(not visited.count(curr)){
+            visited.insert(curr);
+            qu.push(curr);
+        }
+    }
+
     return smallestString;
 }
 
