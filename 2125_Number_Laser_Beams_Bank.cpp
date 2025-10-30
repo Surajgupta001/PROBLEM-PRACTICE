@@ -11,10 +11,7 @@ Laser beams are independent, i.e., one beam does not interfere nor join with ano
 
 Return the total number of laser beams in the bank.
 
- 
-
 Example 1:
-
 
 Input: bank = ["011001","000000","010100","001000"]
 Output: 8
@@ -29,8 +26,8 @@ Explanation: Between each of the following device pairs, there is one beam. In t
  * bank[2][3] -- bank[3][2]
 Note that there is no beam between any device on the 0th row with any on the 3rd row.
 This is because the 2nd row contains security devices, which breaks the second condition.
-Example 2:
 
+Example 2:
 
 Input: bank = ["000","111","000"]
 Output: 0
@@ -41,24 +38,29 @@ Explanation: There does not exist two devices located on two different rows.
 #include <vector>
 using namespace std;
 
-class Solution {
-public:
-    int numberOfBeams(vector<string>& bank) {
-        int prev = 0, ans = 0;
-        
-        for (string s : bank) {
-            int count = 0;
-            for (char c : s) {
-                if (c == '1') {
-                    count++;
-                }
-            }
-            if (count != 0) {
-                ans += (prev * count);
-                prev = count;
+int numberOfBeams(vector<string>& bank) {
+    int n = bank.size();
+
+    int prevDeviceCount = 0;
+    int result = 0;
+
+    for(int i=0; i<n; i++){
+        int currDeviceCount = 0;
+        for(auto &ch : bank[i]){
+            if(ch == '1'){
+                currDeviceCount++;
             }
         }
-        
-        return ans;
+        result += prevDeviceCount * currDeviceCount;
+        if(currDeviceCount != 0){
+            prevDeviceCount = currDeviceCount;
+        }
     }
-};
+    return result;
+}
+
+int main() {
+    vector<string> bank = {"011001","000000","010100","001000"};
+    cout << numberOfBeams(bank) << endl; // Output: 8
+    return 0;
+}
