@@ -3,8 +3,6 @@ Delete Nodes From Linked List Present in Array - [LeetCode - 3217(Medium)]
 ---------------------------------------------------------------------------
 You are given an array of integers nums and the head of a linked list. Return the head of the modified linked list after removing all nodes from the linked list that have a value that exists in nums.
 
- 
-
 Example 1:
 
 Input: nums = [1,2,3], head = [1,2,3,4,5]
@@ -12,8 +10,6 @@ Input: nums = [1,2,3], head = [1,2,3,4,5]
 Output: [4,5]
 
 Explanation:
-
-
 
 Remove the nodes with values 1, 2, and 3.
 
@@ -24,8 +20,6 @@ Input: nums = [1], head = [1,2,1,2,1,2]
 Output: [2,2,2]
 
 Explanation:
-
-
 
 Remove the nodes with value 1.
 
@@ -53,45 +47,66 @@ The number of nodes in the given list is in the range [1, 105].
 The input is generated such that there is at least one node in the linked list that has a value not present in nums.
 */ 
 
-/**
- * Definition for singly-linked list.
- */
-struct ListNode {
-    int val;
-    ListNode *next;
-    ListNode() : val(0), next(nullptr) {}
-    ListNode(int x) : val(x), next(nullptr) {}
-    ListNode(int x, ListNode *next) : val(x), next(next) {}
-};
-
 #include <iostream>
 #include <unordered_set>
 #include <vector>
 using namespace std;
 
-class Solution {
+class node {
 public:
-    ListNode* modifiedList(vector<int>& nums, ListNode* head) {
-        unordered_set<int> st(begin(nums), end(nums));
-        ListNode* prev = NULL;
-        ListNode* curr = head;
+    int value;
+    node *next;
 
-
-        while (curr != NULL && st.count(curr->val)) {
-            head = curr->next;
-            curr = head;
-        }
-
-        while (curr != NULL) {
-            int currVal = curr->val;
-            if (!st.count(currVal)) {
-                prev = curr;
-                curr = curr->next;
-            } else {
-                prev->next = curr->next;
-                curr = curr->next;
-            }
-        }
-        return head;
+    // Constructor
+    node(int data){
+        value = data;
+        next = nullptr;
     }
 };
+
+node* modifiedList(vector<int>& nums, node* head) {
+    unordered_set<int> st(nums.begin(), nums.end());
+
+    // Handle the head
+    while(head != nullptr && st.find(head->value) != st.end()) {
+        node* temp = head;
+        head = head->next;
+        delete(temp); // delete the hanging node -> dangling pointer
+    }
+
+    // Handle the rest of the list
+    node* curr = head;
+    while(curr != nullptr && curr->next != nullptr) {
+        if(st.find(curr->next->value) != st.end()) {
+            node* temp = curr->next;
+            curr->next = curr->next->next;
+            delete(temp); // delete the hanging node -> dangling pointer
+        } else {
+            curr = curr->next;
+        }
+    }
+
+    return head;
+}
+
+int main() {
+    // Example usage:
+    vector<int> nums = {1, 2, 3};
+    node* head = new node(1);
+    head->next = new node(2);
+    head->next->next = new node(3);
+    head->next->next->next = new node(4);
+    head->next->next->next->next = new node(5);
+
+    node* modifiedHead = modifiedList(nums, head);
+
+    // Print the modified list
+    node* curr = modifiedHead;
+    while (curr != nullptr) {
+        cout << curr->value << " ";
+        curr = curr->next;
+    }
+    cout << endl;
+
+    return 0;
+}
