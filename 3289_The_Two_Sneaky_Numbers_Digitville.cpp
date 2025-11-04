@@ -5,8 +5,6 @@ In the town of Digitville, there was a list of numbers called nums containing in
 
 As the town detective, your task is to find these two sneaky numbers. Return an array of size two containing the two numbers (in any order), so peace can return to Digitville.
 
- 
-
 Example 1:
 
 Input: nums = [0,1,1,0]
@@ -47,36 +45,76 @@ The input is generated such that nums contains exactly two repeated elements.
 
 #include <iostream>
 #include <vector>
+#include <unordered_map>
 using namespace std;
 
-
-class Solution {
-public:
-    vector<int> getSneakyNumbers(vector<int>& nums) {
-        int n = (int)nums.size() - 2;
-        int y = 0;
-        for (int x : nums) {
-            y ^= x;
-        }
-        for (int i = 0; i < n; i++) {
-            y ^= i;
-        }
-        int lowBit = y & (-y);
-        int x1 = 0, x2 = 0;
-        for (int x : nums) {
-            if (x & lowBit) {
-                x1 ^= x;
-            } else {
-                x2 ^= x;
-            }
-        }
-        for (int i = 0; i < n; i++) {
-            if (i & lowBit) {
-                x1 ^= i;
-            } else {
-                x2 ^= i;
-            }
-        }
-        return {x1, x2};
+// Approach: Using Frequency - map
+vector<int> getSneakyNumbers(vector<int>& nums) {
+    unordered_map<int, int> freq;
+    for (int num : nums) {
+        freq[num]++;
     }
-};
+    vector<int> result;
+    for (auto& p : freq) {
+        if (p.second == 2) {
+            result.push_back(p.first);
+        }
+    }
+    return result;
+}
+
+// Approach: Using Bit Manipulation - XOR (Making use of different bit as a seperator)
+vector<int> getSneakyNumbers(vector<int>& nums) {
+    // 0....n-1
+    int n = nums.size() - 2;
+
+    int XOR = 0; // a^b
+
+    for(auto &num : nums) {
+        XOR ^= num;
+    }
+
+    for(int num = 0; num <= n - 1; num++) { // Original List
+        XOR ^= num;
+    }
+
+    int trailZeroCount = __builtin_ctz(XOR); // Count of trailing zeros
+    int mask = (1 << trailZeroCount); // Mask to isolate the differing bit
+
+    int group1 = 0;
+    int group2 = 0;
+
+    for(auto &num : nums) {
+        if(num & mask) {
+            group1 ^= num;
+        } else {
+            group2 ^= num;
+        }
+    }
+
+    for(int num = 0; num <= n - 1; num++) {
+        if(num & mask) {
+            group1 ^= num;
+        } else {
+            group2 ^= num;
+        }
+    }
+
+    return {group1, group2};
+}
+
+int main() {
+    vector<int> nums1 = {0, 1, 1, 0};
+    vector<int> nums2 = {0, 3, 2, 1, 3, 2};
+    vector<int> nums3 = {7, 1, 5, 4, 3, 4, 6, 0, 9, 5, 8, 2};
+
+    vector<int> result1 = getSneakyNumbers(nums1);
+    vector<int> result2 = getSneakyNumbers(nums2);
+    vector<int> result3 = getSneakyNumbers(nums3);
+
+    cout << "Sneaky Numbers in nums1: [" << result1[0] << ", " << result1[1] << "]" << endl;
+    cout << "Sneaky Numbers in nums2: [" << result2[0] << ", " << result2[1] << "]" << endl;
+    cout << "Sneaky Numbers in nums3: [" << result3[0] << ", " << result3[1] << "]" << endl;
+
+    return 0;
+}
