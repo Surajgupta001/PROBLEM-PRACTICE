@@ -17,8 +17,6 @@ Return an array of integers representing the results of each query of type [1, x
 
 Note: The power grid preserves its structure; an offline (non‑operational) node remains part of its grid and taking it offline does not alter connectivity.
 
- 
-
 Example 1:
 
 Input: c = 5, connections = [[1,2],[2,3],[3,4],[4,5]], queries = [[1,3],[2,1],[1,1],[2,2],[1,2]]
@@ -26,8 +24,6 @@ Input: c = 5, connections = [[1,2],[2,3],[3,4],[4,5]], queries = [[1,3],[2,1],[1
 Output: [3,2,3]
 
 Explanation:
-
-
 
 Initially, all stations {1, 2, 3, 4, 5} are online and form a single power grid.
 Query [1,3]: Station 3 is online, so the maintenance check is resolved by station 3.
@@ -51,8 +47,8 @@ Query [1,1]: Station 1 is offline and there are no other stations in its grid, s
 
 Constraints:
 
-1 <= c <= 105
-0 <= n == connections.length <= min(105, c * (c - 1) / 2)
+1 <= c <= 10^5
+0 <= n == connections.length <= min(10^5, c * (c - 1) / 2)
 connections[i].length == 2
 1 <= ui, vi <= c
 ui != vi
@@ -66,140 +62,203 @@ queries[i][0] is either 1 or 2.
 #include <vector>
 #include <unordered_map>
 #include <set>
+#include <queue>
 using namespace std;
 
-// Approach : 1 - Brute Force (DFS)
-void dfs(int node, unordered_map<int, vector<int>> &graph, vector<bool> &visited, vector<int> &nodeId, int id, unordered_map<int, set<int>> &componentStations, const vector<bool> &online){
+//Approach-1 (Using DFS)
+//T.C : O((c + n) + q log c)
+//S.C : O(c + n)
+void dfs(int node, unordered_map<int, vector<int>> &graph, int id, vector<int>& nodeId, unordered_map<int, set<int>>& mp, vector<bool>& visited) {
     visited[node] = true;
-    nodeId[node] = id; // Assign component id to node
-    if(online[node]){
-        componentStations[id].insert(node); // Add station to its component's set if it's online
-    }
-
-    for(int neighbor : graph[node]){
-        if(!visited[neighbor]){
-            dfs(neighbor, graph, visited, nodeId, id, componentStations, online);
+    mp[id].insert(node);
+    nodeId[node] = id;
+    for(int &ngbr : graph[node]) {
+        if(!visited[ngbr]) {
+            dfs(ngbr, graph, id, nodeId, mp, visited);
         }
     }
 }
-
-vector<int> processQueries(int c, vector<vector<int>>& connections, vector<vector<int>>& queries) {
+vector<int> processQueriesDFS(int c, vector<vector<int>>& connections, vector<vector<int>>& queries) {
     unordered_map<int, vector<int>> graph;
-    
-    // Build Graph
-    for(auto &edge : connections){
+
+    // Build the graph
+    for(auto &edge :  connections) {
         int u = edge[0];
         int v = edge[1];
         graph[u].push_back(v);
         graph[v].push_back(u);
     }
 
-    vector<bool> visited(c + 1, false); // for DFS visitation
-    vector<bool> online(c + 1, true);   // All stations are initially online
-    vector<int> nodeId(c + 1, 0); // To store component id for each node
-    unordered_map<int, set<int>> componentStations; // component_id -> set of online stations in that component
-
-    for(int node = 1; node <= c; ++node){
-        if(!visited[node]){
-            int id = node; // Use node as component id
-            dfs(node, graph, visited, nodeId, id, componentStations, online);
+    vector<bool> visited(c+1, false);
+    vector<int> nodeId(c+1);
+    
+    //id -> {}
+    unordered_map<int, set<int>> mp;
+    
+    //O(c+n)
+    for(int node = 1; node <= c; node++) {
+        if(!visited[node]) {
+            int id = node;
+            dfs(node, graph, id, nodeId, mp, visited);
         }
     }
-
-    vector<int> results; // To store results of type 1 queries
-    for(auto &query : queries){
-        int type = query[0];
-        int node = query[1];
-
-        if(type == 1){
-            // Maintenance check
-            if(online[node]){
-                results.push_back(node); // Station is online
+    
+    vector<int> result;
+    //O(q * log(c))
+    for(auto &query : queries) {
+        int type = query[0]; //1, 2
+        int node = query[1]; //station/node
+        if(type == 1) {
+            int id = nodeId[node];
+            if(mp[id].count(node)) {
+                result.push_back(node);
+            } else if(!mp[id].empty()) {
+                result.push_back(*mp[id].begin());
+            } else {
+                result.push_back(-1);
             }
-            else{
-                int compId = nodeId[node];
-                if(compId != 0 && !componentStations[compId].empty()){
-                    results.push_back(*componentStations[compId].begin()); // Smallest id online station in the component
-                }
-                else{
-                    results.push_back(-1); // No online stations in the component
-                }
-            }
-        }
-        else if(type == 2){
-            // Take station offline
-            if(online[node]){
-                int compId = nodeId[node];
-                if(compId != 0){
-                    componentStations[compId].erase(node);
-                }
-                online[node] = false;
-            }
+        } else {
+            int id = nodeId[node];
+            mp[id].erase(node); //log(c)
         }
     }
-
-    return results;
+    return result;
 }
 
-// Approach - 2 - Union Find (Disjoint Set Union - DSU) with additional data structures
+//Approach-2 (Using BFS)
+//T.C : O((c + n) + q log c)
+//S.C : O(c + n)
+void bfs(int start, unordered_map<int, vector<int>> &graph, int id, vector<int>& nodeId, unordered_map<int, set<int>>& mp, vector<bool>& visited) {
+    queue<int> q;
+    q.push(start);
+    visited[start] = true;
+    nodeId[start] = id;
+    mp[id].insert(start);
+    while (!q.empty()) {
+        int node = q.front();
+        q.pop();
+        for (int &ngbr : graph[node]) {
+            if (!visited[ngbr]) {
+                visited[ngbr] = true;
+                nodeId[ngbr] = id;
+                mp[id].insert(ngbr);
+                q.push(ngbr);
+            }
+        }
+    }
+}
+vector<int> processQueriesBFS(int c, vector<vector<int>>& connections, vector<vector<int>>& queries) {
+    unordered_map<int, vector<int>> graph;
+
+    // Build the graph
+    for (auto &edge : connections) {
+        int u = edge[0];
+        int v = edge[1];
+        graph[u].push_back(v);
+        graph[v].push_back(u);
+    }
+
+    vector<bool> visited(c + 1, false);
+    vector<int> nodeId(c + 1);
+    
+    unordered_map<int, set<int>> mp;
+    
+    // O(c + n)
+    for (int node = 1; node <= c; node++) {
+        if (!visited[node]) {
+            int id = node;
+            bfs(node, graph, id, nodeId, mp, visited);
+        }
+    }
+    
+    vector<int> result;
+    // O(q * log(c))
+    for (auto &query : queries) {
+        int type = query[0]; // 1 or 2
+        int node = query[1]; // station/node
+        if (type == 1) {
+            int id = nodeId[node];
+            if (mp[id].count(node)) {
+                result.push_back(node);
+            } else if (!mp[id].empty()) {
+                result.push_back(*mp[id].begin());
+            } else {
+                result.push_back(-1);
+            }
+        } else {
+            int id = nodeId[node];
+            mp[id].erase(node); // O(log c)
+        }
+    }
+    return result;
+}
+
+
+//Approach-3 (Using DSU)
+//T.C : O((n+c+q)×α(c)), n = connections.size(), c = number of nodes, q = number of queries
+//S.C : O(n + c + q)
 int find(vector<int>& parent, int x){
-    return parent[x] == x ? x : parent[x] = find(parent, parent[x]);
+    return parent[x] = (parent[x] == x) ? x : find(parent, parent[x]);
 }
 
-void Union(vector<int>& parent, vector<int>& rank, int a, int b){
-    // Union by rank
+void Union(vector<int>& parent, vector<int>& rnk, int a, int b){
     a = find(parent, a);
     b = find(parent, b);
-    if (a == b) return;
-    if (rank[a] < rank[b]) swap(a, b);
-    parent[b] = a;
-    if (rank[a] == rank[b]) rank[a]++;
+    if(a == b) return;
+    if(rnk[a] < rnk[b]){
+        parent[a] = b;
+    } else if(rnk[a] > rnk[b]){
+        parent[b] = a;
+    } else {
+        parent[b] = a;
+        rnk[a]++;
+    }
 }
 
 vector<int> processQueries(int c, vector<vector<int>>& connections, vector<vector<int>>& queries) {
-    // 1) Build DSU for the fixed grid connectivity
-    vector<int> parent(c + 1);
-    vector<int> rank(c + 1, 0);
-    for (int i = 1; i <= c; ++i){
+    vector<int> result;
+    int n = connections.size();
+    
+    vector<int> parent(c+1);
+    vector<int> rnk(c+1, 0);
+    
+    for(int i = 1; i <= c; i++) {
         parent[i] = i;
     }
-    for (auto& e : connections){
-        Union(parent, rank, e[0], e[1]);
+    
+    for(auto& edge : connections) {
+        int u = edge[0];
+        int v = edge[1];
+        Union(parent, rnk, u, v);
     }
-
-    // 2) Build per-component set of online stations (initially all online)
-    vector<set<int>> onlineSet(c + 1);
-    vector<char> online(c + 1, 1);
-    for (int i = 1; i <= c; ++i) {
-        int r = find(parent, i);
-        onlineSet[r].insert(i);
+    
+    unordered_map<int, set<int>> mp; //id -> {ordered set of nodes}
+    vector<int> nodeId(c+1);
+    
+    for(int i = 1;i <= c; i++){
+        int par = find(parent, i);
+        mp[par].insert(i);
+        nodeId[i] = par;
     }
-
-    // 3) Answer queries
-    vector<int> ans;
-    ans.reserve(queries.size());
-    for (auto& q : queries) {
-        int type = q[0];
-        int x = q[1];
-        int r = find(parent, x);
-
-        if (type == 1) {
-            if (online[x]) {
-                ans.push_back(x);
+    
+    for(auto& query : queries){
+        int type = query[0]; //1, 2
+        int node = query[1]; //station/node
+        int id = nodeId[node];
+        if(type == 1) {
+            if(mp[id].find(node) != mp[id].end()){
+                result.push_back(node);
+            } else if(!mp[id].empty()) {
+                result.push_back(*mp[id].begin());
             } else {
-                // Get smallest online station in x's component (if any)
-                if (onlineSet[r].empty()) ans.push_back(-1);
-                else ans.push_back(*onlineSet[r].begin());
-            }
-        } else { // type == 2: take x offline
-            if (online[x]) {
-                online[x] = 0;
-                // Remove from its component's online set
-                onlineSet[r].erase(x);
+                result.push_back(-1);
             }
         }
+        else {
+            mp[id].erase(node);
+        }
     }
-    return ans;
+    return result;
 }
 
 int main() {
