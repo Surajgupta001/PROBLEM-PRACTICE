@@ -34,6 +34,55 @@ s[i] is either '0' or '1'.
 #include <string>
 using namespace std;
 
+// Approach-1 (Simple maths formula to count substrings)
+// T.C : O(n)
+// S.C : O(1)
+
+const int mod = 1e9 + 7;
 int numSub(string s) {
+    long long result = 0;
+    long long count1 = 0;
     
+    for (char ch : s){
+        if (ch == '1'){
+            count1++;
+        }
+        else{
+            result = (result + count1 * (count1 + 1) / 2) % mod;
+            count1 = 0;
+        }
+    }
+    // Adding the last group of 1s
+    result = (result + count1 * (count1 + 1) / 2) % mod;
+    return (int)result;
+}
+
+// Approach-2 (Simple maths formula to count substrings)
+// T.C : O(n)
+// S.C : O(1)
+int numSub(string s) {
+    int result = 0;
+    int count1 = 0;
+    for (char ch : s){
+        if (ch == '1'){
+            count1++;
+            result = (result + count1) % mod;
+        }
+        else{
+            count1 = 0;
+        }
+    }
+    return result;
+}
+
+int main() {
+    string s1 = "0110111";
+    string s2 = "101";
+    string s3 = "111111";
+
+    cout << "Number of substrings in s1: " << numSub(s1) << endl; // Output: 9
+    cout << "Number of substrings in s2: " << numSub(s2) << endl; // Output: 2
+    cout << "Number of substrings in s3: " << numSub(s3) << endl; // Output: 21
+
+    return 0;
 }
