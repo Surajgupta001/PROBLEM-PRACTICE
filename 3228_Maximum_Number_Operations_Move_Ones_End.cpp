@@ -31,7 +31,50 @@ Output: 0
 
 Constraints:
 
-1 <= s.length <= 105
+1 <= s.length <= 10^5
 s[i] is either '0' or '1'.
  
-*/ 
+*/
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+int maxOperations(string s) {
+    int n = s.length();
+    int result = 0;
+    int i = 0;
+    int count1Seen = 0; // count of 1's seen so far
+
+    // NOTE : For maximise => traverse left to right
+    // NOTE : For minimise => traverse right to left
+
+    // NOTE : Count number of 1's before that till 0's = number of operations
+    // i.e. 110 => 2 operations because two 1's before 0
+
+    // LOGIC :
+    // 1. keep counter of 1
+    // 2. s[i] == '0' => add count of 1 to result; more 1's before 0 => more operations
+    // 3. s[i] == '1' => increment count of 1
+
+    while(i < n){
+        if(s[i] == '0'){
+            result += count1Seen;
+            while(i < n && s[i] == '0'){ // removed till first '1' occurance
+                i++;
+            }
+        }
+        else {
+            count1Seen++;
+            i++;
+        }
+    }
+
+    return result;
+}
+
+int main() {
+    string s = "1001101";
+    cout << "Maximum number of operations: " << maxOperations(s) << endl; // Output: 4
+    return 0;
+}
