@@ -61,7 +61,7 @@ int maxBottlesDrunk(int numBottles, int numExchange){
   int totalDrunk = numBottles;
   int emptyBottles = numBottles;
 
-  while(emptyBottles >= numExchange){
+  while (emptyBottles >= numExchange){
     // Only one exchange per cost level
     emptyBottles -= numExchange; // spend empties for 1 full bottle
     totalDrunk += 1;             // drink it
@@ -76,7 +76,7 @@ int maxBottlesDrunk(int numBottles, int numExchange){
 // Time Complexity:
 // Space Complexity: O(1)
 int maxBottlesDrunk(int numBottles, int numExchange){
-  return numBottles + ((-2*numExchange + 3 + sqrt(4*numExchange*numExchange+8*numBottles - 12 * numExchange + 1))/2);
+  return numBottles + ((-2 * numExchange + 3 + sqrt(4 * numExchange * numExchange + 8 * numBottles - 12 * numExchange + 1)) / 2);
 }
 
 int main(){
