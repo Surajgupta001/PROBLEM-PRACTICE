@@ -45,3 +45,18 @@ Constraints:
 1 <= nums[i] <= 1000
 1 <= k <= 100
 */ 
+
+#include <iostream>
+#include <vector>
+#include <numeric>
+using namespace std;
+
+int minOperations(vector<int>& nums, int k) {
+    return accumulate(nums.begin(), nums.end(), 0) % k;
+}
+
+int main() {
+    vector<int> nums1 = {3, 9, 7};
+    int k1 = 5;
+    cout << "Minimum operations for nums: " << minOperations(nums1, k1) << endl; // Output: 4
+}
