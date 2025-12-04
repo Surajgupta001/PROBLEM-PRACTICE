@@ -38,6 +38,19 @@ Constraints:
 All points are pairwise distinct.
 */ 
 
+/*
+Problem 3623 (Medium) - Horizontal Trapezoids Only
+Constraint: Trapezoids must have at least one pair of horizontal sides (parallel to x-axis)
+Approach: Count points at each y-coordinate, then form trapezoids by pairing horizontal lines at different y-levels
+Formula: For each y-level with n points: nC2 horizontal lines, then multiply combinations from different y-levels
+Complexity: O(n) - simple frequency counting
+Input Size: Up to 10^5 points
+
+*-------*    (top horizontal side)
+/         \
+*-----------*  (bottom horizontal side)
+*/ 
+
 #include <iostream>
 #include <vector>
 #include <unordered_map>
