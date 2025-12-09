@@ -38,38 +38,43 @@ using namespace std;
 //S.C : O(n)
 int minSubarray(vector<int>& nums, int p) {
     int n = nums.size();
-    int SUM = 0;
-    
-    //(a+b)%p = (a%p + b%p) % p
-    for(int &num : nums) {
-        SUM = (SUM + num) % p;
+    int sum = 0;
+
+    for(auto &num : nums){
+        sum = (sum + num) % p;
     }
+
+    int target = sum % p;
+
+    if(target == 0) return 0;
+
+    unordered_map<int, int> map; // to store prefix sum modulo and its index => {modulo, index}
     
-    int target = SUM % p;
-    
-    if(target == 0) {
-        return 0;
-    }
-    
-    unordered_map<int, int> mp; //prev sum%p ko store karega
-    
-    int curr = 0;
-    
-    mp[0] = -1;
-    
+    int currSum = 0;
+    map[0] = -1; // to handle case when subarray starts from index 0
     int result = n;
-    
-    for(int j = 0; j < n; j++) {
-        curr = (curr + nums[j]) % p;
-        
-        int remain = (curr - target + p) % p;
-        
-        if(mp.find(remain) != mp.end()) {
-            result = min(result, j - mp[remain]);
+
+    for(int j=0; j<n; j++){
+        currSum = (currSum + nums[j]) % p;
+
+        int remain = (currSum - target + p) % p; // to handle negative modulo
+
+        if(map.count(remain) > 0){
+            result = min(result, j - map[remain]);
         }
-        
-        mp[curr] = j;
+
+        map[currSum] = j; // store/update the current prefix sum modulo and its index
     }
-    
-    return result == n ? -1 : result;
+
+    return (result == n) ? -1 : result;
+}
+
+int  main() {
+    vector<int> nums = {3, 1, 4, 2};
+    int p = 6;
+
+    int result = minSubarray(nums, p);
+    cout << "Length of the smallest subarray to remove: " << result << endl;
+
+    return 0;
 }
