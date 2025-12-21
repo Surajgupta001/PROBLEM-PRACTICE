@@ -21,7 +21,9 @@ Explanation: In this case, no transactions are done and the max profit = 0.
 #include <algorithm>
 using namespace std;
 
-int maxProfit(vector<int>&prices){
+// Approach - 1
+int maxProfit(vector<int>&prices) {
+    
     if(prices.empty()){
         return 0;
     }
@@ -37,8 +39,25 @@ int maxProfit(vector<int>&prices){
             maxProfit = prices[i] - minPrice;
         }
     }
+
     return maxProfit;
 }
+
+// Approach - 2 (Using Kadane's Algorithm)
+int maxProfit(vector<int>&prices) {
+    int maxProfit =0;
+    int currProfit = 0;
+
+    for(int i=1; i<prices.size(); i++){
+        currProfit += prices[i] - prices[i-1];
+        if(currProfit < 0){
+            currProfit = 0;
+        }
+        maxProfit = max(maxProfit, currProfit);
+    }
+    return maxProfit;
+}
+    
 int main(){
 
     int n;
