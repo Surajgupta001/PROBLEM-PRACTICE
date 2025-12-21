@@ -53,37 +53,43 @@ strs[i] consists of lowercase English letters.
 using namespace std;
 
 int minDeletionSize(vector<string>& strs) {
-    int rows = strs.size(); //Number of rows
-    int cols = strs[0].size(); //Number of columns
+    int rows = strs.size();
+    int cols = strs[0].size();
 
-    int deletion = 0;
+    int deletions = 0;
 
     vector<bool> alreadySorted(rows, false);
 
+    // To iterate in the strs
     int row = 0;
     int col = 0;
-    //to iterate in the strs
-    
-    for(col = 0; col < cols; col++) {
-        bool deleted = false;
 
-        for(row = 0; row < rows-1; row++) {
-            if(!alreadySorted[row] && strs[row][col] > strs[row+1][col]) {
-                deletion++;
-                deleted = true;
+    for(col=0; col<cols; col++){
+        bool needDeletion = false;
+
+        // Going through each row
+        for(row=0; row<rows-1; row++){
+            // If the not already sorted then check for deletion
+            if(!alreadySorted[row] && strs[row][col] > strs[row+1][col]){
+                deletions++;
+                needDeletion = true;
                 break;
             }
         }
 
-        if(deleted) {
-            continue;
-        }
+        if(needDeletion) continue; // Move to next column
 
-        for(int i = 0; i < rows-1; i++) {
-            alreadySorted[i] = alreadySorted[i] | (strs[i][col] < strs[i+1][col]);
+        // Update already sorted status
+        for(int i=0; i<rows-1; i++){
+            alreadySorted[i] = alreadySorted[i] || (strs[i][col] < strs[i+1][col]);
         }
-
     }
 
-    return deletion;
+    return deletions;
+}
+
+int main() {
+    vector<string> strs = {"ca","bb","ac"};
+    cout << "Minimum deletions required: " << minDeletionSize(strs) << endl;
+    return 0;
 }
