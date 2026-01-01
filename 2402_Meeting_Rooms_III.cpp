@@ -14,8 +14,6 @@ Return the number of the room that held the most meetings. If there are multiple
 
 A half-closed interval [a, b) is the interval between a and b including a and not including b.
 
- 
-
 Example 1:
 
 Input: n = 2, meetings = [[0,10],[1,5],[2,7],[3,4]]
@@ -28,6 +26,7 @@ Explanation:
 - At time 5, the meeting in room 1 finishes. The third meeting starts in room 1 for the time period [5,10).
 - At time 10, the meetings in both rooms finish. The fourth meeting starts in room 0 for the time period [10,11).
 Both rooms 0 and 1 held 2 meetings, so we return 0. 
+
 Example 2:
 
 Input: n = 3, meetings = [[1,20],[2,10],[3,5],[4,9],[6,8]]
@@ -56,9 +55,73 @@ All the values of starti are unique.
 #include <vector>
 #include <algorithm>
 #include <queue>
+#include <climits>
 using namespace std;
 
-typedef pair<long long, int> P;
+//Approach-1 (Brute Force - Do as said)
+//T.C : O(mlogm +m*n) , where Let n = number of rooms, m =  number of meetings
+//S.C : O(n)
+class Solution {
+public:
+    int mostBooked(int n, vector<vector<int>>& meetings) {
+        int m = meetings.size();
+
+        sort(begin(meetings), end(meetings)); //sort by starting time of meetings
+
+        vector<int> roomsUsedCount(n, 0); //Each room is used 0 times in the beginning
+        vector<long long> lastAvailableAt(n, 0); //Each room will be last available at
+        
+
+        for(vector<int>& meet : meetings) {
+            int start  = meet[0];
+            int end    = meet[1];
+            bool found = false;
+
+            long long EarlyEndRoomTime = LLONG_MAX;
+            int EarlyEndRoom     = 0;
+
+            //Find the first available meeting room
+            for(int room = 0; room < n; room++) {
+                if(lastAvailableAt[room] <= start) {
+                    found = true;
+                    lastAvailableAt[room] = end;
+                    roomsUsedCount[room]++;
+                    break;
+                }
+
+                if(lastAvailableAt[room] < EarlyEndRoomTime) {
+                    EarlyEndRoom = room;
+                    EarlyEndRoomTime = lastAvailableAt[room];
+                }
+            }
+
+            if(!found) {
+                lastAvailableAt[EarlyEndRoom] += (end - start);
+                roomsUsedCount[EarlyEndRoom]++;
+            }
+
+        }
+
+        int resultRoom = -1;
+        int maxUse     = 0;  
+        for(int room = 0; room < n; room++) {
+            if(roomsUsedCount[room] > maxUse) {
+                maxUse = roomsUsedCount[room];
+                resultRoom = room;
+            }
+        }
+
+        return resultRoom;
+    }
+};
+
+
+//Approach-2 (Use priority Queue to find the first available meeting room)
+//T.C : O(mlogm + m*log(n)) , where Let n = number of rooms, m =  number of meetings
+//S.C : O(n)
+class Solution {
+public:
+    typedef pair<long long, int> P;
 
     int mostBooked(int n, vector<vector<int>>& meetings) {
         int m = meetings.size();
@@ -114,3 +177,4 @@ typedef pair<long long, int> P;
 
         return resultRoom;
     }
+};
