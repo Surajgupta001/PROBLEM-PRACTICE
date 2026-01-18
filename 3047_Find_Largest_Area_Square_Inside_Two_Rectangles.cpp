@@ -60,41 +60,38 @@ bottomLeft[i][1] < topRight[i][1]
 #include <vector>
 using namespace std;
 
-class Solution {
-    public:
-        long long largestSquareArea(vector<vector<int>>& bottomLeft, vector<vector<int>>& topRight) {
-            int n = bottomLeft.size(); //topRight.size()
+long long largestSquareArea(vector<vector<int>>& bottomLeft, vector<vector<int>>& topRight) {
+    int n = bottomLeft.size(); // topRight.size() is the same as bottomLeft.size()
     
-            int maxSide = 0;
-    
-            for(int i = 0; i < n; i++) {
-                for(int j = i+1; j < n; j++) {
-                    //Width
-                    int topRightX   = min(topRight[i][0], topRight[j][0]);
-                    int bottomLeftX = max(bottomLeft[i][0], bottomLeft[j][0]);
-    
-                    int width = topRightX - bottomLeftX;
-    
-                    //Height
-                    int topRightY   = min(topRight[i][1], topRight[j][1]);
-                    int bottomLeftY = max(bottomLeft[i][1], bottomLeft[j][1]);
-    
-                    int height = topRightY - bottomLeftY;
-    
-                    int side = min(width, height);
-    
-                    maxSide = max(maxSide, side);
-                }
-            }
-    
-            return 1LL * maxSide*maxSide;
+    int maxSide = 0;
+
+    for(int i=0; i<n; i++){
+        for(int j=i+1; j<n; j++){
+            // Width
+            int topRightX = min(topRight[i][0], topRight[j][0]);
+            int bottomLeftX = max(bottomLeft[i][0], bottomLeft[j][0]);
+
+            int width = topRightX - bottomLeftX; // Calculate width of intersection
+
+            // Height
+            int topRightY = min(topRight[i][1], topRight[j][1]);
+            int bottomLeftY = max(bottomLeft[i][1], bottomLeft[j][1]);
+
+            int height = topRightY - bottomLeftY; // Calculate height of intersection
+
+            int side = min(width, height);
+
+            maxSide = max(maxSide, side);
         }
-    };
-    
+    }
+    return (long long)maxSide * maxSide;
+}
+
 int main() {
-    Solution sol;
     vector<vector<int>> bottomLeft = {{1,1},{2,2},{3,1}};
     vector<vector<int>> topRight = {{3,3},{4,4},{6,6}};
-    cout << sol.largestSquareArea(bottomLeft, topRight) << endl;
+
+    cout << "Largest Area of Square Inside Two Rectangles: " << largestSquareArea(bottomLeft, topRight) << endl;
+
     return 0;
 }
