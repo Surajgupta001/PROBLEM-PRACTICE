@@ -39,96 +39,93 @@ Constraints:
 
 #include <iostream>
 #include <vector>
+#include<set>
 using namespace std;
 
-class Solution {
-    public:
-        typedef long long ll;
-    
-        int minimumPairRemoval(vector<int>& nums) {
-            int n = nums.size();
-    
-            //{a, b, c, d} --> {a, b+c, d}
-            vector<ll> temp(n);
-            for(int i = 0; i < n; i++)
-                temp[i] = nums[i];
-    
-            set<pair<ll, int>> minPairSet;
-    
-            vector<int> nextIndex(n);
-            vector<int> prevIndex(n);
-    
-            for(int i = 0; i < n; i++) {
-                nextIndex[i] = i+1;
-                prevIndex[i] = i-1;
-            }
-    
-            int badPairs = 0;
-            for(int i = 0; i < n-1; i++) {
-                if(temp[i] > temp[i+1]) {
-                    badPairs++;
-                }
-                minPairSet.insert({temp[i] + temp[i+1], i});
-            }
-    
-            int operations = 0;
-    
-            while(badPairs > 0) {
-                int first  = minPairSet.begin()->second;
-                int second = nextIndex[first];
-    
-                int first_left   = prevIndex[first];
-                int second_right = nextIndex[second];
-    
-    
-                minPairSet.erase(begin(minPairSet));
-    
-                if(temp[first] > temp[second]) {
-                    badPairs--;
-                }
-    
-                //{d, (a, b)}
-                if(first_left >= 0) {
-                    if(temp[first_left] > temp[first] &&
-                    temp[first_left] <= temp[first] + temp[second]) {
-                        badPairs--;
-                    } 
-                    else if(temp[first_left] <= temp[first] &&
-                    temp[first_left] > temp[first] + temp[second]) {
-                        badPairs++;
-                    }
-                }
-    
-                //{(a, b), d}
-                if (second_right < n) {
-                    if (temp[second_right] >= temp[second] &&
-                        temp[second_right] < temp[first] + temp[second]) {
-                        badPairs++;
-                    }
-                    else if (temp[second_right] < temp[second] &&
-                             temp[second_right] >= temp[first] + temp[second]) {
-                        badPairs--;
-                    }
-                }
-    
-                if(first_left >= 0) {
-                    minPairSet.erase({temp[first_left] + temp[first], first_left});
-                    minPairSet.insert({temp[first_left] + temp[first] + temp[second], first_left});
-                }
-    
-                if(second_right < n) {
-                    minPairSet.erase({temp[second] + temp[second_right], second});
-                    minPairSet.insert({temp[first] + temp[second] + temp[second_right], first});
-                    prevIndex[second_right] = first;
-                }
-    
-                nextIndex[first] = second_right;
-                temp[first] += temp[second];
-    
-                operations++;
-            }
-    
-            return operations;
+int minimumPairRemoval(vector<int>& nums) {
+    int n = nums.size();
+
+    // {a, b, c, d} => {a, b + c, d} if b + c >= a and b + c <= d
+    vector<long long> temp(n); // to avoid integer overflow make it long long instead of int
+    for (int i = 0; i < n; i++) {
+        temp[i] = nums[i];
+    }
+
+    int operations = 0;
+
+    set<pair<long long, int>> minPairSet; // {sum, index}
+
+    vector<int> prevIndex(n);
+    vector<int> nextIndex(n);
+
+    for(int i = 0; i < n; i++){
+        prevIndex[i] = i - 1;
+        nextIndex[i] = i + 1;
+    }
+
+    int badPairs = 0;
+    for(int i=0; i<n; i++){
+        if(temp[i] > temp[i+1]){ // that means it's decreasing pair
+            badPairs++;
         }
-    };
-    
+        minPairSet.insert({temp[i] + temp[i+1], i});
+    }
+
+    while(badPairs > 0){ // that means array is not sorted yet
+        int first = minPairSet.begin()->second; // index of first element of the minimum sum pair
+        int second = nextIndex[first]; // index of second element of the minimum sum pair
+
+        int first_left = prevIndex[first]; // index of left element of the first element
+        int second_right = nextIndex[second]; // index of right element of the second element
+
+        minPairSet.erase(minPairSet.begin()); // remove the current minimum sum pair
+
+        if(temp[first] > temp[second]){ // that means it's a bad pair
+            badPairs--; // removing a bad pair
+        }
+
+        // {d, (a, b)}
+        if(first_left >= 0){
+            if(temp[first_left] > temp[first] && temp[first_left] <= temp[first] + temp[second]){
+                badPairs--; // removing a bad pair
+            } else if(temp[first_left] <= temp[first] && temp[first_left] > temp[first] + temp[second]){
+                badPairs++; // adding a bad pair
+            }
+        }
+
+        // {(a, b), c}
+        if(second_right < n){
+            if(temp[second_right] >= temp[second] && temp[second_right] < temp[first] + temp[second]){
+                badPairs--; // removing a bad pair
+            } else if(temp[second_right] < temp[second] && temp[second_right] >= temp[first] + temp[second]){
+                badPairs++; // adding a bad pair
+            }
+        }
+
+        // update the temp array
+        if(first_left >= 0){
+            minPairSet.erase({temp[first_left] + temp[first], first_left});
+            minPairSet.insert({temp[first_left] + (temp[first] + temp[second]), first_left});
+        }
+
+        // update the temp array
+        if(second_right < n){
+            minPairSet.erase({temp[second] + temp[second_right], second});
+            minPairSet.insert({(temp[first] + temp[second]) + temp[second_right], first});
+            prevIndex[second_right] = first;
+        }
+
+        nextIndex[first] = second_right;
+        temp[first] += temp[second];
+
+        operations++;
+    }
+
+    return operations;
+}
+
+int main() {
+    vector<int> nums = {5, 2, 3, 1};
+    cout << "Minimum operations to sort the array: " << minimumPairRemoval(nums) << endl;
+    return 0;
+}
