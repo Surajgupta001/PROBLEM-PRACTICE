@@ -46,26 +46,44 @@ Constraints:
 #include <vector>
 using namespace std;
 
-class Solution {
-    public:
-        vector<int> constructTransformedArray(vector<int>& nums) {
-            int n = nums.size();
-    
-            vector<int> result(n, 0);
-    
-            for(int i = 0; i < n; i++) {
-                int shift = nums[i]%n; //reducing the large shifts within 0..n-1 range
-    
-                int newIdx = (i + shift) % n;
-    
-                if(newIdx < 0) {
-                    newIdx += n;
-                }
-    
-                result[i] = nums[newIdx];
-            }
-    
-            return result;
-    
+// Concept => out of bound index in circular array can be handled by using modulo operator.
+
+vector<int> constructTransformedArray(vector<int>& nums) {
+    int n = nums.size();
+    vector<int> result(n, 0);
+
+    for(int i=0; i<n; i++){
+        int steps = nums[i]; // Reducing the large steps within 0...n-1 range.
+        
+        int newIndex = (i + steps) % n; // Moving to the right for positive steps and left for negative steps.
+
+        // If newIndex is negative, we need to wrap it around to the end of the array.
+        if(newIndex < 0){
+            newIndex += n; // Wrapping around to the end of the array.
         }
-    };
+
+        result[i] = nums[newIndex]; // Setting the result for the current index.
+    }
+
+    return result;
+}
+
+int main() {
+    vector<int> nums1 = {3, -2, 1, 1};
+    vector<int> result1 = constructTransformedArray(nums1);
+    cout << "Result for nums1: ";
+    for(int num : result1) {
+        cout << num << " ";
+    }
+    cout << endl;
+
+    vector<int> nums2 = {-1, 4, -1};
+    vector<int> result2 = constructTransformedArray(nums2);
+    cout << "Result for nums2: ";
+    for(int num : result2) {
+        cout << num << " ";
+    }
+    cout << endl;
+
+    return 0;
+}
