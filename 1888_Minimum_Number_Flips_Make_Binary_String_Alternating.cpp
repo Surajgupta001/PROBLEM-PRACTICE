@@ -43,3 +43,16 @@ using namespace std;
 int minFlips(string s) {
         
 }
+
+int main () {
+    string s = "111000";
+    cout << minFlips(s) << endl; // Output: 2
+
+    s = "010";
+    cout << minFlips(s) << endl; // Output: 0
+
+    s = "1110";
+    cout << minFlips(s) << endl; // Output: 1
+
+    return 0;
+}
