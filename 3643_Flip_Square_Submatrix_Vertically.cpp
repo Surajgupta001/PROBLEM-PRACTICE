@@ -9,8 +9,6 @@ Your task is to flip the submatrix by reversing the order of its rows vertically
 
 Return the updated matrix.
 
- 
-
 Example 1:
 
 
@@ -23,8 +21,7 @@ Explanation:
 The diagram above shows the grid before and after the transformation.
 
 Example 2:
-
-​​​​​​​
+​​​​
 Input: grid = [[3,4,2,3],[2,3,4,2]], x = 0, y = 2, k = 2
 
 Output: [[3,4,4,2],[2,3,2,3]]
@@ -32,8 +29,6 @@ Output: [[3,4,4,2],[2,3,2,3]]
 Explanation:
 
 The diagram above shows the grid before and after the transformation.
-
- 
 
 Constraints:
 
@@ -44,4 +39,43 @@ n == grid[i].length
 0 <= x < m
 0 <= y < n
 1 <= k <= min(m - x, n - y)
-*/ 
+*/
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+vector<vector<int>> reverseSubmatrix(vector<vector<int>>& grid, int x, int y, int k) {
+
+    int startRow = x;
+    int endRow = x + k - 1;
+
+    int startCol = y;
+    int endCol = y + k - 1;
+
+    for(int i=startRow; i<=endRow; i++){
+        for(int j=startCol; j<=endCol; j++){
+            swap(grid[i][j], grid[endRow][j]);
+        }
+        endRow--;
+    }
+    return grid;
+}
+
+int main() {
+    vector<vector<int>> grid = {{1,2,3,4},{5,6,7,8},{9,10,11,12},{13,14,15,16}};
+    int x = 1;
+    int y = 0;
+    int k = 3;
+
+    vector<vector<int>> result = reverseSubmatrix(grid, x, y, k);
+
+    for (const auto& row : result) {
+        for (int num : row) {
+            cout << num << " ";
+        }
+        cout << endl;
+    }
+
+    return 0;
+}
