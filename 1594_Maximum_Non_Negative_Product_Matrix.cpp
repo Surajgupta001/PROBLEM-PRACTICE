@@ -41,5 +41,6 @@ n == grid[i].length
 using namespace std;
 
 int maxProductPath(vector<vector<int>>& grid) {
+           int m = grid.size();
            
 }
