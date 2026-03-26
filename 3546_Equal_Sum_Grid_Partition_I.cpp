@@ -41,5 +41,56 @@ Constraints:
 using namespace std;
 
 bool canPartitionGrid(vector<vector<int>>& grid) {
-    
+    int m = grid.size();
+    int n = grid[0].size();
+
+    vector<long long> rowSums(m, 0);
+    vector<long long> colSums(n, 0);
+
+    long long totalSum = 0;
+
+    for(int i=0; i<m; i++){
+        for(int j=0; j<n; j++){
+            totalSum += grid[i][j];
+
+            // Row = i
+            rowSums[i] += grid[i][j];
+
+            // Col = j
+            colSums[j] += grid[i][j];
+        }
+    }
+
+    if(totalSum % 2 != 0) return false;
+
+    // Horizontal Split
+    long long upperSum = 0;
+    for(int i=0; i<m-1; i++){
+        upperSum += rowSums[i];
+        if(upperSum == totalSum - upperSum){
+            return true;
+        }
+    }
+
+    // Vertical Split
+    long long leftSum = 0;
+    for(int j=0; j<n-1; j++){
+        leftSum += colSums[j];
+        if(leftSum == totalSum - leftSum){
+            return true;
+        }
+    }
+
+    return false;
+}
+
+int main () {
+    vector<vector<int>> grid1 = {{1,4}, {2,3}};
+    vector<vector<int>> grid2 = {{1,3}, {2,4}};
+
+    cout << boolalpha; // Print bool values as true/false
+    cout << "Grid 1 can be partitioned: " << canPartitionGrid(grid1) << endl;
+    cout << "Grid 2 can be partitioned: " << canPartitionGrid(grid2) << endl;
+
+    return 0;
 }
