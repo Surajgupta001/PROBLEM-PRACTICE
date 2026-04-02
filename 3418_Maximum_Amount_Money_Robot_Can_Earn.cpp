@@ -58,35 +58,60 @@ n == coins[i].length
 #include <climits>
 using namespace std;
 
-int helper(vector<vector<int>> &coins, int i, int j, int neutralizations) {
-    int m = coins.size();
-    int n = coins[0].size();
+int m;
+int n;
+int t[501][501][3];
 
+int helper(vector<vector<int>>& coins, int i, int j, int neu) {
     if(i == m-1 && j == n-1) {
-        if(coins[i][j] < 0 && neutralizations > 0) {
-            return 0; // Neutralize the robber at the last cell
-        } else {
-            return coins[i][j];
+        if(coins[i][j] < 0 && neu > 0) {
+            return 0; //neutralize kardiya robber ko
         }
+        return coins[i][j];
     }
-
+    
     if(i >= m || j >= n) {
-        return INT_MIN; // Out of bounds
+        return INT_MIN;
     }
-
-    // Take the current cell's coins
-    int take = coins[i][j] + max(helper(coins, i+1, j, neutralizations), helper(coins, i, j+1, neutralizations));
+    
+    if(t[i][j][neu] != INT_MIN) {
+        return t[i][j][neu];
+    }
+    
+    //Take the current cell value
+    int take = coins[i][j] + max(helper(coins, i+1, j, neu), helper(coins, i, j+1, neu));
+    
+    //Skip current value if you can
     int skip = INT_MIN;
-
-    // If there's a robber and we have neutralizations left, we can skip the robbery
-    if(coins[i][j] < 0 && neutralizations > 0) {
-        skip = 
+    
+    if(coins[i][j] < 0 && neu > 0) {
+        int skipDown = helper(coins, i+1, j, neu-1);
+        int skipRight = helper(coins, i, j+1, neu-1);
+        skip = max(skipDown, skipRight);
     }
+    
+    return t[i][j][neu] = max(take, skip);
 }
 
 int maximumAmount(vector<vector<int>>& coins) {
-    int m = coins.size();
-    int n = coins[0].size();
-
+    m = coins.size();
+    n = coins[0].size();
+    
+    for(int i = 0; i < 501; i++) {
+        for(int j = 0; j < 501; j++) {
+            for(int k = 0; k < 3; k++) {
+                t[i][j][k] = INT_MIN;
+            }
+        }
+    }
+    
     return helper(coins, 0, 0, 2);
+}
+
+int main() {
+    vector<vector<int>> coins = {{0,1,-1},{1,-2,3},{2,-3,4}};
+    
+    cout << maximumAmount(coins) << endl; // Output: 8
+    
+    return 0;
 }
