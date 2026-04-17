@@ -11,8 +11,6 @@ Return the minimum absolute distance between the indices of any mirror pair. The
 
 If no mirror pair exists, return -1.
 
- 
-
 Example 1:
 
 Input: nums = [12,21,45,33,54]
@@ -49,11 +47,53 @@ Explanation:
 
 There are no mirror pairs in the array.
 
- 
-
 Constraints:
 
-1 <= nums.length <= 105
-1 <= nums[i] <= 109​​​​​​​
-
+1 <= nums.length <= 10^5
+1 <= nums[i] <= 10^9​​​​​​​
 */ 
+
+#include <iostream>
+#include <vector>
+#include <unordered_map>
+#include <climits>
+#include <algorithm>
+using namespace std;
+
+int getReverse(int num){
+    int result = 0;
+    while(num > 0){
+        result = result * 10 + num % 10;
+        num /= 10;
+    }
+    return result;
+}
+
+int minMirrorPairDistance(vector<int>& nums) {
+    int n = nums.size();
+
+    unordered_map<int, int> maps; // reverse value -> index
+
+    int result = INT_MAX;
+
+    for(int i=0; i<n; i++){
+        if(maps.count(nums[i])){
+            result = min(result, i - maps[nums[i]]);
+        }
+        maps[getReverse(nums[i])] = i;
+    }
+    return result == INT_MAX ? -1 : result;
+}
+
+int main() {
+    vector<int> nums1 = {12, 21, 45, 33, 54};
+    cout << minMirrorPairDistance(nums1) << endl; // Output: 1
+
+    vector<int> nums2 = {120, 21};
+    cout << minMirrorPairDistance(nums2) << endl; // Output: 1
+
+    vector<int> nums3 = {21, 120};
+    cout << minMirrorPairDistance(nums3) << endl; // Output: -1
+
+    return 0;
+}
