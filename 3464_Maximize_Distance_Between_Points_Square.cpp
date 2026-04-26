@@ -113,7 +113,7 @@ int maxDistanceBruteForce(int side, vector<vector<int>>& points, int k) {
     return result;
 }
 
-// OPTIMAL
+// OPTIMAL APPROACH - Unrolling the Square
 long long get1DPosition(vector<int>& point, int side) {
     long long x = point[0];
     long long y = point[1];
