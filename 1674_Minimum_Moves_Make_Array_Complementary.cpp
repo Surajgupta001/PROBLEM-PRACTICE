@@ -45,7 +45,57 @@ n is even.
 #include <climits>
 using namespace std;
 
-
+// Approach: Brute Force
 int minMoves(vector<int>& nums, int limit) {
-           
+
+}
+
+// Approach: Difference Array Technique
+int minMoves(vector<int>& nums, int limit) {
+    int n = nums.size();
+
+    vector<int> diff(2 * limit + 2, 0); // difference array to track changes
+
+    for(int i=0; i<n/2; i++){
+        int a = nums[i];
+        int b = nums[n - 1 - i];
+
+        int minVal = min(a, b) + 1; // minimum value that can be achieved by changing one of the elements
+        int maxVal = max(a, b) + limit; // maximum value that can be
+
+        diff[2] += 2; // initially, all pairs require 2 moves
+        diff[2*limit + 1] -= 2; // after 2*limit, no moves are needed
+
+        // For moves = 1
+        diff[minVal] += (-1); // if we change one element to achieve minVal, we reduce moves by 1
+        diff[maxVal + 1] -= (-1); // after maxVal, we need 2 moves again
+
+        // For moves = 0
+        diff[a + b] += (-1); // if we don't change any element, we save 1 move
+        diff[a + b + 1] -= (-1); // after a + b, we need 2 moves again
+    }
+
+    int result = INT_MAX;
+
+    for(int sum = 2; sum <= 2 * limit; sum++){
+        diff[sum] += diff[sum - 1]; // accumulate the difference array to get the actual moves needed for each sum
+        result = min(result, diff[sum]); // find the minimum moves needed
+    }
+    return result;
+}
+
+int main() {
+    vector<int> nums1 = {1, 2, 4, 3};
+    int limit1 = 4;
+    cout << minMoves(nums1, limit1) << endl; // Output: 1
+
+    vector<int> nums2 = {1, 2, 2, 1};
+    int limit2 = 2;
+    cout << minMoves(nums2, limit2) << endl; // Output: 2
+
+    vector<int> nums3 = {1, 2, 1, 2};
+    int limit3 = 2;
+    cout << minMoves(nums3, limit3) << endl; // Output: 0
+
+    return 0;
 }
