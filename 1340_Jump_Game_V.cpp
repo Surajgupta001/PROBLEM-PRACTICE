@@ -83,25 +83,42 @@ int maxJumps(vector<int>& arr, int d) {
 // Bottom-up DP
 int maxJumps(vector<int>& arr, int d) {
     int n = arr.size();
-
+    // dp[i] = maximum jumps starting from index i
     vector<int> dp(n, 1);
-    // dp[i] = maximum number of indices that can be visited starting from index i
 
-    for(int i=0; i<n; i++){
-        // Left side move
-        for(int j=i-1; j>=max(0, i-d); j--){
-            if(arr[j] >= arr[i]) break;
+    /*
+        In recursion + memoization:
+        solve(i) depends on smaller elements only.
+        So in bottom-up, process smaller values first.
+    */
+    vector<pair<int, int>> vec;
+    for (int i = 0; i < n; i++) {
+        vec.push_back({arr[i], i});
+    }
+    sort(begin(vec), end(vec));
+
+    for (auto& itr : vec) {
+        int val = itr.first;
+        int i   = itr.second;
+
+        // move left
+        for (int j = i - 1; j >= max(0, i - d); j--) {
+            // same breaking condition
+            if (arr[j] >= arr[i])
+                break;
             dp[i] = max(dp[i], 1 + dp[j]);
         }
 
-        // Right side move
-        for(int j=i+1; j<=min(n-1, i+d); j++){
-            if(arr[j] >= arr[i]) break;
+        // move right
+        for (int j = i + 1; j <= min(n - 1, i + d); j++) {
+            // same breaking condition
+            if (arr[j] >= arr[i])
+                break;
             dp[i] = max(dp[i], 1 + dp[j]);
         }
     }
 
-    return *max_element(dp.begin(), dp.end());
+    return *max_element(begin(dp), end(dp));
 }
 
 int main(){
