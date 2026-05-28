@@ -121,3 +121,17 @@ int minimumDiameterAfterMerge(vector<vector<int>>& edges1, vector<vector<int>>& 
 
     return max({diameter1, diameter2, (diameter1 + 1) / 2 + (diameter2 + 1) / 2 + 1});
 }
+
+int main () {
+    vector<vector<int>> edges1 = {{0,1},{0,2},{0,3}};
+    vector<vector<int>> edges2 = {{0,1}};
+
+    cout << minimumDiameterAfterMerge(edges1, edges2) << endl; // Output: 3
+
+    vector<vector<int>> edges3 = {{0,1},{0,2},{0,3},{2,4},{2,5},{3,6},{2,7}};
+    vector<vector<int>> edges4 = {{0,1},{0,2},{0,3},{2,4},{2,5},{3,6},{2,7}};
+
+    cout << minimumDiameterAfterMerge(edges3, edges4) << endl; // Output: 5
+
+    return 0;
+}
