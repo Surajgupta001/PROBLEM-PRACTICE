@@ -47,10 +47,11 @@ Constraints:
 
 #include <iostream>
 #include <vector>
+#include <climits>
 using namespace std;
 
 int minElement(vector<int>& nums) {
-    int result = 10;
+    int result = INT_MAX;
     for (int num : nums) {
         int sum = 0;
         while (num > 0) {
