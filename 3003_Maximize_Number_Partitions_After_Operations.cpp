@@ -61,66 +61,73 @@ s consists only of lowercase English letters.
 1 <= k <= 26
 */ 
 
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
+#include <string>
+#include <unordered_map>
 using namespace std;
 
-class Solution {
-public:
-    int maxPartitionsAfterOperations(string s, int k) {
-        int n = s.length();
-        vector<vector<int>> left(n, vector<int>(3)), right(n, vector<int>(3));
-        int num = 0, mask = 0, count = 0;
-        for (int i = 0; i < n - 1; i++) {
-            int binary = 1 << (s[i] - 'a');
-            if (!(mask & binary)) {
-                count++;
-                if (count <= k) {
-                    mask |= binary;
-                } else {
-                    num++;
-                    mask = binary;
-                    count = 1;
-                }
-            }
-            left[i + 1][0] = num;
-            left[i + 1][1] = mask;
-            left[i + 1][2] = count;
-        }
+#define ll long long
 
-        num = 0, mask = 0, count = 0;
-        for (int i = n - 1; i > 0; i--) {
-            int binary = 1 << (s[i] - 'a');
-            if (!(mask & binary)) {
-                count++;
-                if (count <= k) {
-                    mask |= binary;
-                } else {
-                    num++;
-                    mask = binary;
-                    count = 1;
-                }
-            }
-            right[i - 1][0] = num;
-            right[i - 1][1] = mask;
-            right[i - 1][2] = count;
-        }
+int helper(ll idx, ll uniqueChars, bool canChanged, string &s, int k, unordered_map<ll, int> &dp) {
+    // create a unique key for the current state by combining the index, unique characters bitmask, and canChanged flag into a single long long integer.
+    ll key = (idx << 27) | (uniqueChars << 1) | canChanged; 
 
-        int Max = 0;
-        for (int i = 0; i < n; i++) {
-            int seg = left[i][0] + right[i][0] + 2;
-            int totMask = left[i][1] | right[i][1];
-            int totCount = 0;
-            while (totMask) {
-                totMask = totMask & (totMask - 1);
-                totCount++;
-            }
-            if (left[i][2] == k && right[i][2] == k && totCount < 26) {
-                seg++;
-            } else if (min(totCount + 1, 26) <= k) {
-                seg--;
-            }
-            Max = max(Max, seg);
-        }
-        return Max;
+    // check if the result for the current state is already computed
+    if(dp.count(key)) return dp[key];
+
+    // base case: if we have processed the entire string, return 0 as there are no more partitions to be made.
+    if(idx >= s.size()) return 0;
+    
+    // get the index of the current character in the alphabet (0 for 'a', 1 for 'b', ..., 25 for 'z')
+    int charIndex = s[idx] - 'a';
+    
+    // update the unique characters bitmask by setting the bit corresponding to the current character to 1 (using bitwise OR)
+    int newUniqueChars = uniqueChars | (1LL << charIndex);
+
+    // count the number of unique characters by counting the number of set bits in the bitmask (using the built-in function __builtin_popcountll)
+    int uniqueCharCount = __builtin_popcountll(newUniqueChars);
+
+    int result;
+
+    if(uniqueCharCount > k){
+        // if the number of unique characters exceeds k, we need to start a new partition. We increment the partition count by 1 and reset the unique characters bitmask to only include the current character.
+        result = 1 + helper(idx+1, (1LL << charIndex), canChanged, s, k, dp);
+    } else {
+        // if the number of unique characters does not exceed k, we continue with the current partition.
+        result = helper(idx+1, newUniqueChars, canChanged, s, k, dp);
     }
-};
+
+    if(canChanged){
+        for(int newCharIndex=0; newCharIndex<26; newCharIndex++){
+            // create a new bitmask for unique characters by setting the bit corresponding to the new character index to 1 (using bitwise OR)
+            int newCharSet = uniqueChars | (1LL << newCharIndex);
+            
+            // count the number of unique characters in the new bitmask (using the built-in function __builtin_popcountll)
+            int newUniqueCharCount = __builtin_popcountll(newCharSet);
+
+            if(newUniqueCharCount > k){
+                // if the number of unique characters in the new bitmask exceeds k, we need to start a new partition. We increment the partition count by 1 and reset the unique characters bitmask to only include the new character.
+                result = max(result, 1 + helper(idx+1, (1LL << newCharIndex), false, s, k, dp));
+            } else {
+                // if the number of unique characters in the new bitmask does not exceed k, we continue with the current partition.
+                result = max(result, helper(idx+1, newCharSet, false, s, k, dp));
+            }
+        }
+    }
+
+    return dp[key] = result; // store the computed result in the dp map before returning it
+}
+
+int maxPartitionsAfterOperations(string s, int k) {
+    unordered_map<ll, int> dp;
+    // we add 1 to the result to account for the last partition that will be made when the string is fully processed.
+    return helper(0, 0, true, s, k, dp) + 1;
+}
+
+int main() {
+    string s = "accca";
+    int k = 2;
+    cout << maxPartitionsAfterOperations(s, k) << endl; // Output: 3
+    return 0;
+}
