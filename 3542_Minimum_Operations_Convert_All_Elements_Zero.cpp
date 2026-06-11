@@ -53,8 +53,66 @@ Constraints:
 
 #include <iostream>
 #include <vector>
+#include <algorithm>
+#include <unordered_set>
+#include <stack>
 using namespace std;
 
+// Brute Force Approach
 int minOperations(vector<int>& nums) {
-    
+    unordered_set<int> sets(nums.begin(), nums.end());
+
+    int n = nums.size();
+
+    int operations = 0;
+
+    for(auto target : sets){
+        if(target == 0) continue;
+
+        bool flow = false;
+        for(size_t i=0; i<n; i++){
+            if(nums[i] == target){
+                if(!flow){
+                    flow = true;
+                    operations++;
+                }
+            } else if (nums[i] < target){
+                flow = false;
+            }
+        }
+    }
+    return operations;
+}
+
+// Monotonic Stack Approach
+int minOperations(vector<int>& nums) {
+    stack<int> st;
+    int operations = 0;
+
+    for(size_t i=0; i<nums.size(); i++){
+        while(!st.empty() and st.top() > nums[i]){
+            st.pop();
+        }
+        
+        if(nums[i] == 0) continue;
+
+        if(st.empty() or st.top() < nums[i]){
+            st.push(nums[i]);
+            operations++;
+        }
+    }
+    return operations;
+}
+
+int main() {
+    vector<int> nums1 = {0,2};
+    cout << minOperations(nums1) << endl; // Output: 1
+
+    vector<int> nums2 = {3,1,2,1};
+    cout << minOperations(nums2) << endl; // Output: 3
+
+    vector<int> nums3 = {1,2,1,2,1,2};
+    cout << minOperations(nums3) << endl; // Output: 4
+
+    return 0;
 }
