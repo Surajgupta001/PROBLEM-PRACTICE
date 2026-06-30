@@ -34,29 +34,7 @@ s only consists of a, b or c characters.
 using namespace std;
 
 int numberOfSubstrings(string s){
-    int n = s.length();
-    vector<int> freq(3, 0);
-    int req = 3;
-    int formed = 0;
-    int ans = 0;
-    int left = 0;
-
-    for(int right = 0; right < n; right++){
-        freq[s[right] - 'a']++;
-        if(freq[s[right] - 'a'] == 1){
-            formed++;
-        }
-
-        while(formed == req && left <= right){
-            ans += n - right;
-            freq[s[left] - 'a']--;
-            if(freq[s[left] - 'a'] == 0){
-                formed--;
-            }
-            left++;
-        }
-    }
-    return ans;
+    
 }
 
 int main(){
