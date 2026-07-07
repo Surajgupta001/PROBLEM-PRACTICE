@@ -39,22 +39,22 @@ Constraints:
 */
 
 #include <iostream>
+#include <string>
 using namespace std;
 
 long long sumAndMultiply(int n) {
-    long long x = 0; // To store the concatenated non-zero digits
-    int sum = 0; // To store the sum of non-zero digits
-
-    while (n > 0) {
-        int digit = n % 10; // Get the last digit
-        if (digit != 0) {
-            x = digit + x * 10; // Concatenate the digit to x
-            sum += digit; // Add the digit to sum
+    string s = to_string(n);
+    long long x = 0;
+    int sum = 0;
+    
+    for (char c : s) {
+        if (c != '0') {
+            int digit = c - '0';
+            x = x * 10 + digit;
+            sum += digit;
         }
-        n /= 10; // Remove the last digit from n
     }
-
-    return x * sum; // Return the product of x and sum
+    return x * sum;
 }
 
 int main() {
