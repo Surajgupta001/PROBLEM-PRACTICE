@@ -97,45 +97,7 @@ int countCompleteComponents(int n, vector<vector<int>> &edges) {
     return count;
 }
 
-int main(){
-    int n;
-    cout << "Enter the number of nodes: ";
-    cin >> n;
-
-    int numEdges;
-    cout << "Enter the number of edges: ";
-    cin >> numEdges;
-
-    vector<vector<int>> edges(numEdges, vector<int>(2));
-    cout << "Enter the edges (u v):" << endl;
-    for (int i = 0; i < numEdges; i++){
-        cin >> edges[i][0] >> edges[i][1];
-    }
-
-    int count = countCompleteComponents(n, edges);
-    cout << "Number of complete components: " << count << endl;
-
-    return 0;
-}
-
-// Enter the number of nodes: 6
-// Enter the number of edges: 4
-// Enter the edges (u v):
-// 0 1
-// 0 2
-// 1 2
-// 3 4
-// Number of complete components: 3Enter the number of nodes: 6
-// Enter the number of edges: 4
-// Enter the edges (u v):
-// 0 1
-// 0 2
-// 1 2
-// 3 4
-// Number of complete components: 3
-
-/*
-================ Using Disjoint Set Union (DSU) ================
+// ================ Using Disjoint Set Union (DSU) ================
 int find(vector<int>& parent, int x){
     return parent[x] = (parent[x] == x) ? x : find(parent, parent[x]);
 }
@@ -195,4 +157,40 @@ int countCompleteComponents(int n, vector<vector<int>>& edges){
     }
     return count;
 }
-*/ 
+
+int main(){
+    int n;
+    cout << "Enter the number of nodes: ";
+    cin >> n;
+
+    int numEdges;
+    cout << "Enter the number of edges: ";
+    cin >> numEdges;
+
+    vector<vector<int>> edges(numEdges, vector<int>(2));
+    cout << "Enter the edges (u v):" << endl;
+    for (int i = 0; i < numEdges; i++){
+        cin >> edges[i][0] >> edges[i][1];
+    }
+
+    int count = countCompleteComponents(n, edges);
+    cout << "Number of complete components: " << count << endl;
+
+    return 0;
+}
+
+// Enter the number of nodes: 6
+// Enter the number of edges: 4
+// Enter the edges (u v):
+// 0 1
+// 0 2
+// 1 2
+// 3 4
+// Number of complete components: 3Enter the number of nodes: 6
+// Enter the number of edges: 4
+// Enter the edges (u v):
+// 0 1
+// 0 2
+// 1 2
+// 3 4
+// Number of complete components: 3
