@@ -58,4 +58,62 @@ Constraints:
 1 <= n == balance.length <= 10^5
 -10^9 <= balance[i] <= 10^9
 There is at most one negative value in balance initially.
-*/ 
+*/
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+long long minMoves(vector<int>& balance) {
+    int n = balance.size();
+    
+    int culpritIndex = -1;
+    long long sum = 0;
+
+    for(int i=0; i<n; i++){
+        sum += balance[i];
+        if(balance[i] < 0){
+            if(culpritIndex != -1) return -1; // More than one negative balance
+            culpritIndex = i;
+        }
+    }
+
+    if(culpritIndex == -1) return 0; // No negative balance, no moves needed
+
+    if(sum < 0) return -1; // Total balance is negative, impossible to balance
+
+    long long moves = 0;
+    int distance = 1;
+
+    while(balance[culpritIndex] < 0){
+        int left = (culpritIndex + distance) % n;
+        int right = (culpritIndex - distance + n) % n;
+
+        long long available = balance[left] + balance[right];
+        if(left == right){
+            available -= balance[left]; // Avoid double counting if left and right are the same
+        }
+        
+        long long needed = -balance[culpritIndex];
+        long long taken = min(needed, available);
+
+        moves += taken*distance;
+        balance[culpritIndex] += taken;
+
+        distance++;
+    }
+
+    return moves;
+}
+
+int main() {
+    vector<int> balance1 = {5, 1, -4};
+    vector<int> balance2 = {1, 2, -5, 2};
+    vector<int> balance3 = {-3, 2};
+
+    cout << "Minimum moves for balance1: " << minMoves(balance1) << endl; // Output: 4
+    cout << "Minimum moves for balance2: " << minMoves(balance2) << endl; // Output: 6
+    cout << "Minimum moves for balance3: " << minMoves(balance3) << endl; // Output: -1
+
+    return 0;
+}
