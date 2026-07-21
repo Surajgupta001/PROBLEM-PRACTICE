@@ -55,3 +55,65 @@ Constraints:
 2 <= k <= prices.length
 k is even
 */
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+long long maxProfit(vector<int>& prices, vector<int>& strategy, int k) {
+    int n = prices.size();
+
+    long long actualProfit = 0;
+    vector<long long> profit(n); // Original Profit of each day
+    
+    for(int i=0; i<n; i++){
+        profit[i] = (long long)strategy[i] * prices[i];
+        actualProfit += profit[i];
+    }
+
+    long long originalWindowProfit = 0;
+    long long modifiedWindowProfit = 0;
+    long long maxGain = 0; // modifiedWindowProfit - originalWindowProfit
+
+    int i = 0;
+    int j = 0;
+
+    // Sliding Window to calculate the maximum gain from modifying a subarray of length k
+    while(j < n){
+        originalWindowProfit += profit[j];
+        
+        // Second half of the window contributes to modifiedWindowProfit
+        if(j - i + 1 > k/2){
+            modifiedWindowProfit += prices[j];
+        }
+
+        // If the window size exceeds k, slide the window
+        if(j - i + 1 > k){
+            originalWindowProfit -= profit[i];
+            modifiedWindowProfit -= prices[i + k/2];
+            i++;
+        }
+
+        // Evaluate window of size
+        if(j - i + 1 == k){
+            long long gain = modifiedWindowProfit - originalWindowProfit;
+            maxGain = max(maxGain, gain);
+        }
+        j++;
+    }
+    return actualProfit + maxGain;
+}
+
+int main() {
+    vector<int> prices = {4, 2, 8};
+    vector<int> strategy = {-1, 0, 1};
+    int k = 2;
+    cout << maxProfit(prices, strategy, k) << endl; // Output: 10
+
+    prices = {5, 4, 3};
+    strategy = {1, 1, 0};
+    k = 2;
+    cout << maxProfit(prices, strategy, k) << endl; // Output: 9
+
+    return 0;
+}
