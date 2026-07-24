@@ -38,10 +38,118 @@ s[i] is either '0' or '1'.
 
 #include <iostream>
 #include <vector>
+#include <climits>
 using namespace std;
 
+// Approach : 1 s => s + s => sliding window of size n => check for min flips for both patterns 010101... and 101010...
 int minFlips(string s) {
-        
+    int n = s.length();
+    s = s + s; // Concatenate the string to itself to handle rotations
+
+    // s1 = "01010101..."
+    // s2 = "10101010..."
+
+    string s1;
+    string s2;
+    for(int i=0; i<2*n; i++){
+        s1 += (i % 2 == 0) ? '0' : '1';
+        s2 += (i % 2 == 0) ? '1' : '0';
+    }
+
+    int flips1 = 0;
+    int flips2 = 0;
+    int result = INT_MAX;
+
+    // Sliding window
+    int i = 0;
+    int j = 0;
+    while(j < 2*n){
+        if(s[j] != s1[j]) flips1++;
+        if(s[j] != s2[j]) flips2++;
+
+        if(j - i + 1 > n){// shrink the window size to n
+            if(s[i] != s1[i]) flips1--;
+            if(s[i] != s2[i]) flips2--;
+            i++;
+        }
+
+        if(j - i + 1 == n){
+            result = min({result, flips1, flips2});
+        }
+
+        j++;
+    }
+    return result;
+}
+
+// Approach : 2 - Not use s = s + s, use modulo to handle rotations
+int minFlips(string s) {
+    int n = s.length();
+
+    // s1 = "01010101..."
+    // s2 = "10101010..."
+
+    string s1;
+    string s2;
+    for(int i=0; i<2*n; i++){
+        s1 += (i % 2 == 0) ? '0' : '1';
+        s2 += (i % 2 == 0) ? '1' : '0';
+    }
+
+    int flips1 = 0;
+    int flips2 = 0;
+    int result = INT_MAX;
+
+    // Sliding window
+    int i = 0;
+    int j = 0;
+    while(j < 2*n){
+        if(s[j % n] != s1[j]) flips1++;
+        if(s[j % n] != s2[j]) flips2++;
+
+        if(j - i + 1 > n){// shrink the window size to n
+            if(s[i % n] != s1[i]) flips1--;
+            if(s[i % n] != s2[i]) flips2--;
+            i++;
+        }
+
+        if(j - i + 1 == n){
+            result = min({result, flips1, flips2});
+        }
+
+        j++;
+    }
+    return result;
+}
+
+// Approach : 3 -  without use of extra space for s1 and s2, use modulo to handle rotations
+int minFlips(string s) {
+    int n = s.length();
+
+    int flips1 = 0; // flips for pattern starting with '0'
+    int flips2 = 0; // flips for pattern starting with '1'
+    int result = INT_MAX;
+
+    // Sliding window
+    int i = 0;
+    int j = 0;
+    while(j < 2*n){
+        if(s[j % n] != (j % 2 == 0 ? '0' : '1')) flips1++;
+        if(s[j % n] != (j % 2 == 0 ? '1' : '0')) flips2++;
+
+        if(j - i + 1 > n){// shrink the window size to n
+            if(s[i % n] != (i % 2 == 0 ? '0' : '1')) flips1--;
+            if(s[i % n] != (i % 2 == 0 ? '1' : '0')) flips2--;
+            i++;
+        }
+
+        if(j - i + 1 == n){
+            result = min({result, flips1, flips2});
+        }
+
+        j++;
+    }
+    return result;
 }
 
 int main () {
