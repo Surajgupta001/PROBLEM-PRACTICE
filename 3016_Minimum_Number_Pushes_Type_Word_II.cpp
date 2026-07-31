@@ -64,8 +64,37 @@ word consists of lowercase English letters.
 
 #include <iostream>
 #include <string>
+#include <vector>
 using namespace std;
 
 int minimumPushes(string word) {
-            
+    vector<int> freqMap(26, 0);
+
+    for(auto &ch : word) freqMap[ch - 'a']++; // Count the frequency of each letter in the word
+
+    // Sort the frequency map in descending order
+    sort(freqMap.begin(), freqMap.end(), greater<int>());
+
+    int result = 0;
+
+    for(int i=0; i<26; i++){
+        int freq = freqMap[i];
+        int press = (i / 8) + 1; // Calculate the number of presses needed for this letter
+        result += freq * press; // Add the total presses for this letter to the result
+    }
+
+    return result;
+}
+
+int main() {
+    string word = "abcde";
+    cout << minimumPushes(word) << endl; // Output: 5
+
+    word = "xyzxyzxyzxyz";
+    cout << minimumPushes(word) << endl; // Output: 12
+
+    word = "aabbccddeeffgghhiiiiii";
+    cout << minimumPushes(word) << endl; // Output: 24
+
+    return 0;
 }

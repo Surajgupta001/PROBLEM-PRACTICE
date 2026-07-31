@@ -52,8 +52,29 @@ All letters in word are distinct.
 
 #include <iostream>
 #include <string>
+#include <unordered_map>
 using namespace std;
 
 int minimumPushes(string word) {
-            
+    int result = 0;
+
+    unordered_map<int, int> map;
+    int assign_key = 2;
+
+    for(auto &ch : word){
+        if(assign_key > 9){
+            assign_key = 2;
+        }
+
+        map[assign_key]++;          // Number of letters assigned to this key
+        result += map[assign_key];  // Cost to type this letter
+        assign_key++;
+    }
+    return result;
+}
+
+int main() {
+    string word = "abcde";
+    cout << minimumPushes(word) << endl;
+    return 0;
 }
