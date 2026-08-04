@@ -49,53 +49,75 @@ using namespace std;
 //Approach - Simple maths + Binary Exponentiation and Fermat's Little Theorem
 //T.C : O(log(M)) for Binary Exponentiation power(mult, M-2)
 //S.C : O(1)
-class Fancy {
-public:
-    typedef long long ll;
+long long mod = 1e9 + 7;
+#define ll long long
 
-    ll M = 1e9+7;
+vector<ll> seq;
+ll add = 0;
+ll mult = 1;
 
-    vector<ll> seq;
-    ll add = 0;
-    ll mult = 1;
+// Binary Exponentiation function to calculate (base^exp) % mod -> using Fermat's Little Theorem
+ll power(ll a, ll b) {
+    if(b == 0) return 1;
 
-    //Binary Exponentiation for Fermat's Little Theorem -> power(mult, M-2);
-    long long power(long long a, long long b) {
-        if(b == 0)
-            return 1;
+    ll half = power(a, b / 2);
+    ll result = (half * half) % mod;
 
-        long long half   = power(a, b/2);
-        long long result = (half * half) % M;
-
-        if(b%2 == 1) {
-            result = (result * a) % M;
-        }
-
-        return result;
+    if(b % 2 == 1){
+        result = (result * a) % mod;
     }
 
+    return result;
+}
+class Fancy {
+public:
     Fancy() {
-        
+        seq.clear();
     }
     
     void append(int val) {
-        long long x = ((val - add) % M + M) * power(mult, M-2)%M;
+        ll x = ((val - add + mod) % mod * power(mult, mod - 2)) % mod;
         seq.push_back(x);
     }
     
     void addAll(int inc) {
-        add = (add + inc) % M;
+        add = (add + inc) % mod;
     }
     
     void multAll(int m) {
-        mult = (mult * m) % M;
-        add  = (add * m) % M;
+        mult = (mult * m) % mod;
+        add = (add * m) % mod;
     }
     
     int getIndex(int idx) {
-        if(idx >= seq.size())
-            return -1;
-
-        return (seq[idx]*mult + add) % M;
+        if(idx >= seq.size()) return -1;
+        ll x = (seq[idx] * mult + add) % mod;
+        return (int)x;
     }
 };
+
+/**
+ * Your Fancy object will be instantiated and called as such:
+ * Fancy* obj = new Fancy();
+ * obj->append(val);
+ * obj->addAll(inc);
+ * obj->multAll(m);
+ * int param_4 = obj->getIndex(idx);
+ */
+
+int main() {
+    Fancy fancy;
+    fancy.append(2);   // fancy sequence: [2]
+    fancy.addAll(3);   // fancy sequence: [5]
+    fancy.append(7);   // fancy sequence: [5, 7]
+    fancy.multAll(2);  // fancy sequence: [10, 14]
+    cout << fancy.getIndex(0) << endl; // return 10
+    fancy.addAll(3);   // fancy sequence: [13, 17]
+    fancy.append(10);  // fancy sequence: [13, 17, 10]
+    fancy.multAll(2);  // fancy sequence: [26, 34, 20]
+    cout << fancy.getIndex(0) << endl; // return 26
+    cout << fancy.getIndex(1) << endl; // return 34
+    cout << fancy.getIndex(2) << endl; // return 20
+
+    return 0;
+}
