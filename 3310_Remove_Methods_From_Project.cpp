@@ -62,8 +62,9 @@ vector<int> remainingMethods(int n, int k, vector<vector<int>>& invocations) {
     vector<vector<int>> graph(n);
     vector<int> inDegree(n, 0);
     vector<bool> isSuspicious(n, false);
-    // Build the graph and compute in-degrees
-    for(auto &edge : invocations){
+
+    // Build graph and indegree
+    for (auto &edge : invocations) {
         int u = edge[0];
         int v = edge[1];
 
@@ -71,61 +72,63 @@ vector<int> remainingMethods(int n, int k, vector<vector<int>>& invocations) {
         inDegree[v]++;
     }
 
-    // Mark suspicious methods using BFS
+    // BFS to mark suspicious nodes
     queue<int> q;
     q.push(k);
     isSuspicious[k] = true;
 
-    while(!q.empty()){
+    while(!q.empty()) {
         int curr = q.front();
         q.pop();
 
-        for(auto &neighbor : graph[curr]){
-            inDegree[neighbor]--;
-            if(!isSuspicious[neighbor]){
-                q.push(neighbor);
+        for(int &neighbor : graph[curr]) {
+            inDegree[neighbor]--;   // remove edge from suspicious node
+
+            if (!isSuspicious[neighbor]) {
                 isSuspicious[neighbor] = true;
+                q.push(neighbor);
             }
         }
     }
 
-    // Check if any suspicious method is invoked by a non-suspicious method
-    vector<int> result;
+    // Check whether any suspicious node still has incoming edges
     bool canRemove = true;
-    for(int i=0; i<n; i++){
-        if(isSuspicious[i] && inDegree[i] > 0){
-            // If a suspicious method is invoked by a non-suspicious method, we cannot remove it
+
+    for(int i = 0; i < n; i++) {
+        if (isSuspicious[i] && inDegree[i] > 0) {
             canRemove = false;
             break;
         }
-        if(!isSuspicious[i]){
+    }
+
+    vector<int> result;
+
+    if(!canRemove) {
+        // Return all methods
+        for(int i = 0; i < n; i++){
             result.push_back(i);
+        }
+    } else {
+        // Return only remaining methods
+        for(int i = 0; i < n; i++) {
+            if(!isSuspicious[i]){
+                result.push_back(i);
+            }
         }
     }
 
-    if(canRemove){
-        vector<int> remaining;
-        for(int i=0; i<n; i++){
-            if(!isSuspicious[i]){
-                remaining.push_back(i);
-            }
-        }
-        return remaining;
-    }
-    
-    return result; // Return empty if we cannot remove suspicious methods
+    return result;
 }
 
 int main() {
     int n = 5, k = 0;
-    vector<vector<int>> invocations = {{1,2},{0,2},{0,1},{3,4}};
+    vector<vector<int>> invocations = {{1,2}, {0,2}, {0,1}, {3,4}};
+
     vector<int> result = remainingMethods(n, k, invocations);
-    
+
     cout << "Remaining Methods: ";
-    for(int method : result){
-        cout << method << " ";
-    }
-    cout << endl;
+    for (int x : result)
+        cout << x << " ";
 
     return 0;
 }
