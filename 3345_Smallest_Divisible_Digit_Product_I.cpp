@@ -1,0 +1,59 @@
+/*
+Smallest Divisible Digit Product I - [Leetcode - 3345(Easy)]
+----------------------------------------------------------------
+You are given two integers n and t. Return the smallest number greater than or equal to n such that the product of its digits is divisible by t.
+
+Example 1:
+
+Input: n = 10, t = 2
+
+Output: 10
+
+Explanation:
+
+The digit product of 10 is 0, which is divisible by 2, making it the smallest number greater than or equal to 10 that satisfies the condition.
+
+Example 2:
+
+Input: n = 15, t = 3
+
+Output: 16
+
+Explanation:
+
+The digit product of 16 is 6, which is divisible by 3, making it the smallest number greater than or equal to 15 that satisfies the condition.
+
+Constraints:
+
+1 <= n <= 100
+1 <= t <= 10
+*/
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <string>
+using namespace std;
+
+
+int smallestNumber(int n, int t) {
+    string str = to_string(n);
+    while (true) {
+        int product = 1;
+        for (char ch : str) {
+            product *= (ch - '0');
+        }
+        if (product % t == 0) {
+            return stoi(str);
+        }
+        n++;
+        str = to_string(n);
+    }
+    return -1;
+}
+
+int main() {
+    int n = 10, t = 2;
+    cout << smallestNumber(n, t) << endl; // Output: 10
+    return 0;
+}
