@@ -178,3 +178,14 @@ public:
         return resultRoom;
     }
 };
+
+int main () {
+    Solution solution;
+    int n = 2;
+    vector<vector<int>> meetings = {{0, 10}, {1, 5}, {2, 7}, {3, 4}};
+    
+    int result = solution.mostBooked(n, meetings);
+    cout << "The room that held the most meetings: " << result << endl;
+
+    return 0;
+}
