@@ -52,31 +52,67 @@ s consists only of characters '0' and '1'.
 
 #include <iostream>
 #include <vector>
+#include <cmath>
 using namespace std;
 
 int numberOfSubstrings(string s) {
-    int n = s.size();
-    vector<int> pre(n + 1);
-    pre[0] = -1;
-    for (int i = 0; i < n; i++) {
-        if (i == 0 || (i > 0 && s[i - 1] == '0')) {
-            pre[i + 1] = i;
-        } else {
-            pre[i + 1] = pre[i];
-        }
+    int n = s.length();
+
+    // Precalculate the prefix sums of zeros and ones
+    vector<int> cumCountOne(n, 0);
+    cumCountOne[0] = (s[0] == '1') ? 1 : 0;
+
+    for(int i = 1; i < n; i++){
+        cumCountOne[i] = cumCountOne[i-1] + (s[i] == '1' ? 1 : 0);
     }
-    int res = 0;
-    for (int i = 1; i <= n; i++) {
-        int cnt0 = s[i - 1] == '0';
-        int j = i;
-        while (j > 0 && cnt0 * cnt0 <= n) {
-            int cnt1 = (i - pre[j]) - cnt0;
-            if (cnt0 * cnt0 <= cnt1) {
-                res += min(j - pre[j], cnt1 - cnt0 * cnt0 + 1);
+
+    int result = 0;
+
+    // O(n * n) worst
+    // j - i + 1 = l
+    // l^2 -------> ~n
+    // l = sqrt(n)
+    // O(n * sqrt(n)) average --- best case
+    for(int i = 0; i < n; i++){
+        for(int j = i; j < n; j++){
+            int oneCount = cumCountOne[j] - (i - 1 >= 0 ? cumCountOne[i-1] : 0);
+            int zeroCount = (j - i + 1) - oneCount;
+
+            if((zeroCount * zeroCount) > oneCount){
+                // SKip j to avoid indices
+                int wasteIndices = (zeroCount * zeroCount) - oneCount;
+                j += wasteIndices - 1; // -1 because the loop will increment j
+            } else if ((zeroCount * zeroCount) == oneCount){
+                result += 1;
+            } else { // (zeroCount * zeroCount) < oneCount
+                //[i....j] is a valid substring, and all substrings starting from i and ending at k (where j <= k < n) will also be valid
+                result += 1;
+
+                // Try to see how much j can right untill substring dominant
+                int k = sqrt(oneCount) - zeroCount;
+                int nextJ = j + k;
+
+                if(nextJ >= n){ // out of bounds
+                    result += (n - j - 1); // all remaining substrings are valid
+                    break;
+                } else {
+                    result += k;
+                }
+
+                j = nextJ; // move j to the next valid position
             }
-            j = pre[j];
-            cnt0++;
         }
     }
-    return res;
+
+    return result;
+}
+
+int main() {
+    string s = "00011";
+    cout << numberOfSubstrings(s) << endl; // Output: 5
+
+    s = "101101";
+    cout << numberOfSubstrings(s) << endl; // Output: 16
+
+    return 0;
 }
